@@ -646,50 +646,68 @@ body::after {
     }
 
     .spread-area-wrapper {
-        overflow-x: auto; /* Allow horizontal scroll *within this wrapper* if needed */
+        overflow-x: auto; /* Should not be needed now, but keep as safety */
         padding: 10px;
-        width: 100%; /* Make wrapper take available width */
+        width: 100%;
         box-sizing: border-box;
     }
 
-    /* --- Scaling for Complex Layouts --- */
+    /* --- Mobile Layout for Complex Spreads --- */
+    /* Stack cards vertically */
     .spread-area.celtic-cross-layout,
     .spread-area.horseshoe-layout {
-        transform: scale(0.55); /* Slightly larger scale? Adjust as needed */
-        transform-origin: top center; /* Scale from top center */
-        margin-left: auto; /* Auto margins for centering block */
-        margin-right: auto;
-        margin-bottom: -200px; /* Reduce bottom space, adjust as needed */
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center cards horizontally */
+        /* Remove scaling and fixed positioning rules */
+        transform: none;
+        transform-origin: initial;
+        margin: 0; /* Reset margins */
         width: auto;
         min-width: 0;
         min-height: 0;
-        /* Keep position relative for centering */
-        position: relative; 
+        position: relative; /* Keep relative for potential inner absolute elements if any */
+        gap: 20px; /* Add gap between stacked cards */
     }
 
-    /* Remove absolute positioning for cards within scaled layouts on mobile? */
-    /* Consider stacking them if scaling is still problematic */
-     /* e.g. 
+    /* Reset card positioning within complex layouts for mobile */
     .spread-area.celtic-cross-layout .card-container,
     .spread-area.horseshoe-layout .card-container {
-        position: relative; 
-        top: auto; 
-        left: auto; 
-        transform: none; 
-        margin-bottom: 20px; 
+        position: relative; /* Keep relative for label */
+        top: auto;
+        left: auto;
+        transform: none !important; /* Override potential inline transforms? */
+        margin-bottom: 25px; /* Space between stacked cards + label */
+        width: 120px; /* Maintain card width */
     }
-    .spread-area.celtic-cross-layout, .spread-area.horseshoe-layout {
-        display: flex; 
-        flex-direction: column; 
-        align-items: center; 
-        transform: none; 
-        margin: 0; 
-    }
-    */
 
+    /* Ensure card container itself doesn't get unwanted margins */
+    .spread-area.celtic-cross-layout .card-container:nth-child(n),
+    .spread-area.horseshoe-layout .card-container:nth-child(n) {
+         margin-left: 0;
+         margin-right: 0;
+    }
+
+    /* --- Other Mobile Adjustments --- */
     .position-label {
-        font-size: 0.85em; 
-        padding: 3px;
+        font-size: 0.8em; /* Smaller labels */
+        padding: 2px 4px;
+        /* Adjust position if needed for stacked layout */
+        bottom: -18px; /* Ensure it's below card */
+        top: auto;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+     /* Ensure labels don't overlap in stacked view */
+    .label-left, .label-right, .label-above {
+        /* Force labels below cards */
+        bottom: -18px; 
+        top: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        width: 90%;
     }
 
     .interpretation-area {
