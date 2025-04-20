@@ -1,0 +1,28 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Vercel
+.vercel/
+
+# Node Modules (if using Node.js locally for testing/dev)
+node_modules/
+
+# Environment variables
+.env*
+!\.env.example
+
+# API Keys / Secrets
+*api*key*.txt
+*secret*.txt
+apikey.txt
+
+# IDE / Editor directories
+.idea/
+.vscode/
+*.swp
+*.swo
