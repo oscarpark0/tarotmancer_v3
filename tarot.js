@@ -449,7 +449,7 @@ async function handleGetInterpretation() {
         };
 
         // Call our serverless function endpoint
-        const response = await fetch('/api/getInterpretation', {
+        const response = await fetch('/api/interpret', { // CORRECTED PATH
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
