@@ -1,0 +1,9 @@
+{
+  "name": "tarotmancer-v3",
+  "version": "1.0.0",
+  "description": "Tarot reading application with AI interpretation",
+  "private": true,
+  "dependencies": {
+    "axios": "^1.6.8" 
+  }
+}
