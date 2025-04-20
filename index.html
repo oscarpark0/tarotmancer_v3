@@ -1,82 +1,57 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tarot Reader</title>
+    <title>tarotmancer</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Tarot Reader</h1>
-            <p class="subtitle">Explore the cards</p>
-        </header>
-
-        <main>
-            <section id="intro" class="active-section">
-                <h2>Welcome</h2>
-                <p>This tarot reader uses true computational randomness to ensure each reading is unique and unpredictable.</p>
-                <p>Select a spread to begin:</p>
-
-                <div class="spread-selection">
-                    <div class="spread-option" data-spread="mirrors">
-                        <h3>Five Card Spread</h3>
-                        <p>A comprehensive 5-card reading that explores multiple aspects of your question or situation.</p>
+        <h1>tarotmancer</h1>
+        <div class="main-content">
+            <div class="left-panel">
+                <div id="controls" class="controls-area">
+                    <div class="spread-selector">
+                        <span>Select Spread:</span>
+                        <div class="spread-buttons">
+                            <button class="spread-button active" data-spread="threeCard">3 Card Spread</button>
+                            <button class="spread-button" data-spread="celticCross">Celtic Cross</button>
+                            <button class="spread-button" data-spread="horseshoe">Horseshoe</button>
+                        </div>
                     </div>
-                    <div class="spread-option" data-spread="threshold">
-                        <h3>Four Card Spread</h3>
-                        <p>A 4-card reading that examines the influences and potential outcomes of your current situation.</p>
-                    </div>
-                    <div class="spread-option" data-spread="echoes">
-                        <h3>Three Card Spread</h3>
-                        <p>A classic 3-card reading showing past, present, and future influences.</p>
-                    </div>
-                    <div class="spread-option" data-spread="single">
-                        <h3>Single Card</h3>
-                        <p>A focused reading with one card that addresses the core of your question.</p>
+                    <button id="dealButton" disabled>Deal Spread</button>
+                    <button id="interpretButton" disabled>Get Interpretation</button>
+                </div>
+                <div id="spreadAreaWrapper" class="spread-area-wrapper">
+                    <h2>Spread</h2>
+                    <div id="spreadArea" class="spread-area">
+                        <!-- Cards and position labels will be dynamically added here -->
                     </div>
                 </div>
-            </section>
-
-            <section id="reading" class="hidden-section">
-                <div class="spread-container">
-                    <div id="spread-title">
-                        <h2>Your Reading</h2>
-                        <p id="spread-description"></p>
+            </div>
+            <div class="right-panel">
+                <div id="stats-controls" class="controls-area">
+                    <div class="tab-header">
+                        <button class="tab-button active" data-tab="interpretation">Reading</button>
+                        <button class="tab-button" data-tab="stats">Statistics</button>
                     </div>
-                    <div id="cards-container"></div>
                 </div>
-
-                <div class="actions">
-                    <button id="reveal-all">Reveal All Cards</button>
-                    <button id="get-interpretation">Get Claude's Interpretation</button>
-                    <button id="new-reading">New Reading</button>
+                <div class="tab-content">
+                    <div id="interpretationArea" class="interpretation-area">
+                        <h2>Reading</h2>
+                        <div id="interpretationText">Select a spread and click "Deal Spread".<span class="placeholder-text">Your reading will appear here...</span></div>
+                    </div>
+                    <div id="statsArea" class="stats-area hidden">
+                        <h2>Card Statistics</h2>
+                        <div id="statsText">Statistics will appear here after draws.<span class="placeholder-text">Draw statistics will appear here...</span></div>
+                    </div>
                 </div>
-            </section>
-
-            <section id="interpretation" class="hidden-section">
-                <h2>Claude's Interpretation</h2>
-                <div id="loading-interpretation" class="loading">
-                    <div class="spinner"></div>
-                    <p>Generating interpretation...</p>
-                </div>
-                <div id="interpretation-content"></div>
-                <button id="back-to-reading">Back to Reading</button>
-            </section>
-        </main>
-
-        <footer>
-            <p>This tarot reader uses true randomness to provide a unique experience each time.</p>
-            <p>Interpretations provided by Claude AI.</p>
-        </footer>
+            </div>
+        </div>
     </div>
 
     <script src="tarot.js"></script>
-    <script src="claude.js"></script>
-    <script src="app.js"></script>
 </body>
 </html>
