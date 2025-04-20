@@ -621,4 +621,64 @@ body::after {
     bottom: 0;
     overflow-y: auto; /* Scroll within fixed box */
 }
- 
+
+/* --- Responsive Design --- */
+@media (max-width: 767px) {
+    .container {
+        padding: 10px; /* Reduce padding */
+        gap: 15px; /* Reduce gap */
+        /* Prevent container itself from scaling layouts */
+        /* width: 100%; */
+        /* min-height: auto; */
+    }
+
+    h1 {
+        font-size: 1.5em; /* Slightly smaller title */
+    }
+
+    .controls-area {
+        flex-direction: column; /* Stack controls vertically */
+        gap: 10px;
+    }
+
+    .spread-area-wrapper {
+        overflow-x: auto; /* Allow horizontal scroll if layout still too wide */
+        padding: 10px;
+    }
+
+    /* --- Scaling for Complex Layouts --- */
+    /* Adjust these scale factors as needed */
+    .spread-area.celtic-cross-layout,
+    .spread-area.horseshoe-layout {
+        /* Scale the entire layout down */
+        transform: scale(0.5); 
+        /* Adjust origin to scale from top-left or top-center */
+        transform-origin: top left; 
+         /* Add margin to account for scaling from top-left */
+        margin-left: -175px; /* Approx -(OriginalWidth * (1 - scale) / 2) for centering */
+        margin-bottom: -300px; /* Approx -(OriginalHeight * (1 - scale)) to reduce excess space */
+        /* Explicitly allow shrinking */
+        width: auto; 
+        min-width: 0; 
+        min-height: 0;
+    }
+
+     /* Adjust horseshoe origin and margins if needed */
+    .spread-area.horseshoe-layout {
+         transform-origin: top center;
+         margin-left: 0; /* Centered by default */
+         margin-bottom: -250px; /* Reduce space */
+     }
+
+    /* Optionally scale card labels */
+    .position-label {
+        font-size: 0.9em; /* Make labels slightly larger relative to scaled cards */
+        padding: 3px;
+    }
+
+    .interpretation-area {
+        max-height: 40vh; /* Limit height */
+        overflow-y: auto; /* Allow scrolling */
+        font-size: 0.9em;
+    }
+}
