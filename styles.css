@@ -1,4 +1,466 @@
-/* Base styles should be here */
+body {
+    background-color: #000;
+    color: #00FF00; /* Bright green text */
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    padding: 15px;
+    /* Subtle Scanlines Effect */
+    background-image: linear-gradient(rgba(0, 255, 0, 0.05) 1px, transparent 1px);
+    background-size: 100% 3px;
+    /* Subtle Text Glow */
+    text-shadow: 0 0 3px rgba(0, 255, 0, 0.4);
+    display: flex; /* Use flexbox for overall layout */
+    justify-content: center;
+}
+
+.container {
+    position: relative; /* Bezel overlays */
+    overflow: hidden;
+    border: 4px solid #003300; /* Thicker CRT bezel */
+    border-radius: 10px; /* Rounded screen edges */
+    background-color: rgba(0, 0, 0, 0.9);
+    padding: 20px;
+    box-sizing: border-box;
+    box-shadow:
+        inset 0 0 30px rgba(0, 255, 0, 0.2), /* inner glow */
+        0 0 15px rgba(0, 255, 0, 0.3);  /* outer glow */
+    filter: contrast(1.2) brightness(1.2) saturate(1.3) blur(0.5px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    width: 100vw;
+    min-height: 100vh;
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
+h1 {
+    text-align: center;
+    border-bottom: 1px solid #00FF00;
+    padding-bottom: 10px;
+    width: 100%;
+}
+
+/* Areas Styling */
+.controls-area,
+.spread-area-wrapper,
+.interpretation-area,
+.stats-area {
+    border: 1px solid #00FF00;
+    padding: 15px;
+    width: 100%; /* Take full width of parent panel */
+    box-sizing: border-box; /* Ensure padding/border are inside width */
+    background-color: rgba(0, 20, 0, 0.8); /* Darker green tint background */
+    box-shadow: 0 0 5px #00FF00; /* Subtle glow */
+}
+
+.controls-area {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.spread-selector label {
+    margin-right: 5px;
+}
+
+.spread-selector select,
+button {
+    background-color: #000;
+    color: #00FF00;
+    border: 1px solid #00FF00;
+    padding: 8px 15px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.spread-selector select:hover,
+button:hover {
+    background-color: #003300; /* Dark green highlight */
+    box-shadow: 0 0 8px #00FF00;
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.spread-area-wrapper h2,
+.interpretation-area h2,
+.stats-area h2 {
+    margin-top: 0;
+    text-align: center;
+    border-bottom: 1px dashed #00FF00;
+    padding-bottom: 5px;
+}
+
+.spread-area {
+    display: flex;
+    flex-wrap: wrap; /* Allow cards to wrap */
+    justify-content: center;
+    gap: 20px;
+    padding-top: 15px;
+    min-height: 250px; /* Ensure space even when empty */
+    perspective: 1000px; /* Needed for 3D flip */
+    position: relative; /* For positioning labels */
+    max-width: 100%;
+}
+
+/* Default flex layout (for 3-card spread) */
+.spread-area {
+    display: flex;
+    flex-wrap: wrap; /* Allow cards to wrap */
+    justify-content: center;
+    gap: 20px;
+}
+
+/* --- Celtic Cross Specific Layout --- */
+.spread-area.celtic-cross-layout {
+    display: block; /* Override flex for absolute positioning */
+    min-height: 750px; /* Needs more vertical space */
+    margin: 0;
+    box-sizing: border-box;
+    position: relative; /* Change from absolute if wrapper handles positioning */
+    transform-origin: top left; /* ADDED for scaling */
+    transition: transform 0.3s ease-out; /* ADDED for smooth scaling */
+    width: 670px; /* Approximate width needed */
+}
+
+/* Base style for absolutely positioned cards in Celtic Cross */
+.spread-area.celtic-cross-layout .card-container {
+    position: absolute;
+    margin-bottom: 0; /* Override default margin */
+    /* Transitions for smooth placement (optional) */
+    /* transition: top 0.5s ease-out, left 0.5s ease-out, transform 0.5s ease-out; */
+}
+
+/* Position each card */
+/* Card 1: Present Situation */
+.spread-area.celtic-cross-layout .card-container:nth-child(1) {
+    top: 270px;
+    left: 160px;
+}
+/* Card 2: Immediate Challenge */
+.spread-area.celtic-cross-layout .card-container:nth-child(2) {
+    top: 270px;
+    left: 160px;
+    transform: rotate(90deg);
+}
+/* Card 3: Distant Past (Foundation) */
+.spread-area.celtic-cross-layout .card-container:nth-child(3) {
+    top: 550px;
+    left: 160px;
+}
+/* Card 4: Recent Past */
+.spread-area.celtic-cross-layout .card-container:nth-child(4) {
+    top: 270px;
+    left: -40px;
+}
+/* Card 5: Best Outcome/Potential */
+.spread-area.celtic-cross-layout .card-container:nth-child(5) {
+    top: 10px;
+    left: 160px;
+}
+/* Card 6: Near Future */
+.spread-area.celtic-cross-layout .card-container:nth-child(6) {
+    top: 270px;
+    left: 345px;
+}
+/* Card 7: Your Attitude/Approach */
+.spread-area.celtic-cross-layout .card-container:nth-child(7) {
+    top: 670px;
+    left: 520px;
+}
+/* Card 8: External Influences */
+.spread-area.celtic-cross-layout .card-container:nth-child(8) {
+    top: 450px;
+    left: 520px;
+}
+/* Card 9: Hopes and Fears */
+.spread-area.celtic-cross-layout .card-container:nth-child(9) {
+    top: 230px;
+    left: 520px;
+}
+/* Card 10: Final Outcome */
+.spread-area.celtic-cross-layout .card-container:nth-child(10) {
+    top: 10px;
+    left: 520px;
+}
+
+/* --- Horseshoe Specific Layout --- */
+.spread-area.horseshoe-layout {
+    display: block; /* Override flex */
+    position: relative;
+    min-height: 600px; /* Estimated height, adjust as needed */
+    min-width: 700px; /* Estimated width, adjust as needed */
+    width: 700px;
+    max-width: 700px;
+    margin: 0 auto; /* Center the layout if wrapper is wider */
+    transform-origin: top center; /* Scale from top-center */
+}
+
+.spread-area.horseshoe-layout .card-container {
+    position: absolute;
+    margin-bottom: 0; /* Override default */
+}
+
+/* Horseshoe card positions (adjust pixel values as needed) */
+.spread-area.horseshoe-layout .card-container:nth-child(1) { /* Past */
+    top: 400px;
+    left: 50px;
+}
+.spread-area.horseshoe-layout .card-container:nth-child(2) { /* Present */
+    top: 250px;
+    left: 180px;
+}
+.spread-area.horseshoe-layout .card-container:nth-child(3) { /* Near Future */
+    top: 150px;
+    left: 320px;
+    /* transform: rotate(5deg); */
+}
+.spread-area.horseshoe-layout .card-container:nth-child(4) { /* Attitude */
+    top: 250px;
+    left: 460px;
+    /* transform: rotate(-5deg); */
+}
+.spread-area.horseshoe-layout .card-container:nth-child(5) { /* Obstacles */
+    top: 400px;
+    left: 590px;
+}
+.spread-area.horseshoe-layout .card-container:nth-child(6) { /* External */
+    top: 550px;
+    left: 460px;
+}
+.spread-area.horseshoe-layout .card-container:nth-child(7) { /* Outcome */
+    top: 550px;
+    left: 180px;
+}
+
+/* Card Styling */
+.card-container {
+    position: relative; /* Needed for absolute positioning of the label */
+    width: 120px; /* Standard card width */
+    height: 200px; /* Standard card height */
+    cursor: pointer;
+    perspective: 1000px; /* For 3D flip effect */
+    margin-bottom: 25px; /* Space below card for label */
+}
+
+.card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+    border: 1px solid #00FF00;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
+.card.flipped {
+    transform: rotateY(180deg);
+}
+
+.card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden; /* Hide the back side when facing away */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.card-face.front {
+    background-color: #001a00; /* Dark green front */
+    transform: rotateY(180deg);
+}
+
+.card-face.back {
+    background-color: #000;
+    background-image:
+        linear-gradient(45deg, #003300 25%, transparent 25%),
+        linear-gradient(-45deg, #003300 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #003300 75%),
+        linear-gradient(-45deg, transparent 75%, #003300 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    border: 1px solid #00FF00;
+}
+
+.card-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block; /* Remove extra space below image */
+    opacity: 0.9; /* Slightly faded image */
+}
+
+.card-orientation {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    font-size: 8px;
+    color: #FFFF00; /* Yellow for emphasis */
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 1px 3px;
+    border-radius: 2px;
+}
+
+/* Card Label Styling */
+.card-label {
+    position: absolute;
+    bottom: -20px; /* Position below the card */
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.8em;
+    color: #00FF00;
+    padding: 2px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    background: rgba(0,0,0,0.6);
+}
+
+/* Adjust label position for specific layout needs if necessary */
+.label-left {
+    text-align: right;
+    left: auto;
+    right: 105%; /* Position to the left of the card */
+    bottom: 50%; /* Center vertically */
+    transform: translateY(50%);
+    width: auto; /* Allow width to adjust to content */
+    white-space: nowrap;
+}
+
+.label-right {
+    text-align: left;
+    left: 105%; /* Position to the right of the card */
+    bottom: 50%;
+    transform: translateY(50%);
+    width: auto;
+    white-space: nowrap;
+}
+
+.label-above {
+    bottom: auto;
+    top: -20px; /* Position above the card */
+    left: 50%;
+    transform: translateX(-50%);
+    width: auto;
+    white-space: nowrap;
+}
+
+.interpretation-area {
+    max-height: 400px; /* Max height before scrolling */
+    overflow-y: auto; /* Scroll if content exceeds max height */
+}
+
+#interpretation-text {
+    white-space: pre-wrap; /* Preserve line breaks from API */
+    line-height: 1.6;
+}
+
+#loading-indicator {
+    display: none; /* Hidden by default */
+    text-align: center;
+    padding: 10px;
+}
+
+/* Stats Area */
+.stats-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    padding-top: 10px;
+}
+
+.stat-item {
+    border: 1px solid #005000;
+    padding: 5px;
+    background-color: rgba(0, 10, 0, 0.5);
+}
+
+.stat-item strong {
+    color: #50FF50;
+}
+
+/* --- CRT Effects --- */
+.container::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 2;
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+}
+
+.container::after {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: rgba(18, 16, 16, 0.1);
+    opacity: 0;
+    z-index: 2;
+    pointer-events: none;
+    animation: flicker 0.15s infinite;
+}
+
+@keyframes flicker {
+    0%   { opacity: 0.1; }
+    50%  { opacity: 0.2; }
+    100% { opacity: 0.1; }
+}
+
+/* Noise/Static Overlay */
+/* Add this as another pseudo-element or adjust existing ones */
+.noise-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXWBgYGHh4d5eXlzc3OLi4ubm5uVlZWPj4+NjY19fX2JiYl/f39ra2uRkZGZmZlpaWmXl5dvb29xcXGTk5NnZ2c8TV1mAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gcXABEwNjlqZQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANCSURBVEiJzZZbfxtJFIjr+5+d+1dZ3+x+fI18gMJAwAQLgDwg83nGcALJkAl88gHhf/z/5xQf9nZ1dZYy+7z353nfd55+3xxF57i4wN5i3wXqJO4iT0v7z6u6UaF8K2a97pDkWxTfF7/F7q/1zX19P0fQ8e8V5iPqH6t6H0PveLq/f43+800sZvYv5bW746Y5+xY1U1tV72gwx3F0I7jP83+1+99p4w5+q66W1/fW949eJ0s/wM9Y1L8bXKvD4k/6P0/0O1L8tL+2683tJ3U//VMWdP0G/yO1U59t9K+f7+8/n5+Y89tN17iP6P7V2/h304h/2P9L87/1zX1+f3m9pfz/jvz39/3L/yM4p8v/+V+Vd3zJd/2L9v+f+wM9s/k3tP1n4Y33v19P0/9K8Puf+/P/+n++w47u4TfJ7f1/xPz9/wf94eP5P97/3Pz8/Pm6X19fXz//8uXy8/Pz56WdK/7y8vPzt6el5edn58vN59r81//f/z+v5+vr6+v7+/v3v7+/39/fPz+/v7++//8/f/+///38/f/+///8/f3//9///5+/v/+///+//5+fv7///3///3//Pz//f/9//39//39//39///8/f//8/f//+//5+fv7///3///9/vz+//3///5/vz//f//+//5///3//Pz//v/9//v//v/+v//+P/7//f/8/P/7//f39/f//8/f//8/v//9/f//8///7//P//+/v/+/P3/8/P//9///5/v//8//v//9/P//8//v//+//7//v//+//7//P3/8///7+///3///3//Pz//f/9//3//Pz9///7///3///3///7//v//+//7///7+///3//Pz//f/9//v//v//v//+///7//P//+///7///3///9///3///5+/v//+///7+/v//8///7///3///3///7+///3///3///3///7///3///3///7///3///3///3+v//+///7+////AAAAAElFTkSuQmCC'); /* Replace with actual noise pattern if needed */
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 3;
+    animation: crt-noise 0.08s infinite steps(2);
+}
+
+@keyframes crt-noise {
+  0%, 100% { opacity: 0.05; }
+  50%      { opacity: 0.08; }
+}
+
+/* Interpretation text specific glow */
+#interpretation-text {
+    text-shadow:
+        0 0 1px #00FF00,
+        0 0 3px #00FF00,
+        0 0 5px #00FF00;
+}
+
+/* Fixed height/scroll for interpretation */
+.interpretation-area {
+    min-height: 150px; /* Minimum height */
+    /* max-height: 40vh; */ /* Adjust as needed, maybe based on viewport height */
+    overflow-y: auto; /* Scroll within fixed box */
+}
+
+/* == Responsive Design == */
 
 @media (max-width: 768px) { /* Breakpoint for tablets/large phones */
 
