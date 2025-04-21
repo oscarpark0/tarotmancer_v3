@@ -126,7 +126,6 @@ button:disabled {
     position: relative; /* Change from absolute if wrapper handles positioning */
     transform-origin: top left; /* ADDED for scaling */
     transition: transform 0.3s ease-out; /* ADDED for smooth scaling */
-    width: 670px; /* Approximate width needed */
 }
 
 /* Base style for absolutely positioned cards in Celtic Cross */
@@ -200,68 +199,180 @@ button:disabled {
     max-width: 700px;
     margin: 0 auto; /* Center the layout if wrapper is wider */
     transform-origin: top center; /* Scale from top-center */
+    transition: transform 0.3s ease-out;
 }
 
+/* Base style for absolutely positioned cards in Horseshoe */
 .spread-area.horseshoe-layout .card-container {
     position: absolute;
-    margin-bottom: 0; /* Override default */
+    margin-bottom: 0;
 }
 
-/* Horseshoe card positions (adjust pixel values as needed) */
-.spread-area.horseshoe-layout .card-container:nth-child(1) { /* Past */
+/* Position Horseshoe cards (Example Positions - Tweak as needed) */
+/* Card 1: Past */
+.spread-area.horseshoe-layout .card-container:nth-child(1) {
     top: 400px;
-    left: 50px;
+    left: 20px;
+    transform: rotate(-30deg);
 }
-.spread-area.horseshoe-layout .card-container:nth-child(2) { /* Present */
-    top: 250px;
-    left: 180px;
-}
-.spread-area.horseshoe-layout .card-container:nth-child(3) { /* Near Future */
+/* Card 2: Present */
+.spread-area.horseshoe-layout .card-container:nth-child(2) {
     top: 150px;
-    left: 320px;
-    /* transform: rotate(5deg); */
+    left: 100px;
+    transform: rotate(-15deg);
 }
-.spread-area.horseshoe-layout .card-container:nth-child(4) { /* Attitude */
-    top: 250px;
-    left: 460px;
-    /* transform: rotate(-5deg); */
+/* Card 3: Future */
+.spread-area.horseshoe-layout .card-container:nth-child(3) {
+    top: 10px;
+    left: 290px; /* Center top */
 }
-.spread-area.horseshoe-layout .card-container:nth-child(5) { /* Obstacles */
+/* Card 4: Obstacles */
+.spread-area.horseshoe-layout .card-container:nth-child(4) {
+    top: 150px;
+    left: 480px;
+    transform: rotate(15deg);
+}
+/* Card 5: Advice */
+.spread-area.horseshoe-layout .card-container:nth-child(5) {
     top: 400px;
-    left: 590px;
+    left: 560px;
+    transform: rotate(30deg);
 }
-.spread-area.horseshoe-layout .card-container:nth-child(6) { /* External */
-    top: 550px;
-    left: 460px;
+/* Card 6: External Influences */
+.spread-area.horseshoe-layout .card-container:nth-child(6) {
+    top: 550px; /* Lower */
+    left: 400px;
 }
-.spread-area.horseshoe-layout .card-container:nth-child(7) { /* Outcome */
-    top: 550px;
+/* Card 7: Outcome */
+.spread-area.horseshoe-layout .card-container:nth-child(7) {
+    top: 550px; /* Lower */
     left: 180px;
 }
 
-/* Card Styling */
-.card-container {
-    position: relative; /* Needed for absolute positioning of the label */
-    width: 120px; /* Standard card width */
-    height: 200px; /* Standard card height */
-    cursor: pointer;
-    perspective: 1000px; /* For 3D flip effect */
-    margin-bottom: 25px; /* Space below card for label */
+/* Position Label Styling */
+.position-label {
+    position: absolute;
+    font-size: 0.75em;
+    color: #00cc00;
+    text-align: center;
+    max-width: 90px;
+    width: max-content;
+    pointer-events: none;
+    z-index: 2;
+    background: rgba(0,0,0,0.7);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 3px #003300;
+    line-height: 1.2;
+    overflow: hidden;
+    white-space: pre-line;
+}
+.label-below {
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.label-above {
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.label-left {
+    top: 50%;
+    left: -10px;
+    transform: translate(-100%,-50%);
+    width: max-content;
+    text-align: right;
+}
+.label-right {
+    top: 50%;
+    right: -10px;
+    transform: translate(100%,-50%);
+    width: max-content;
+    text-align: left;
+}
+.label-below {
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.label-above {
+    top: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.label-left {
+    top: 50%;
+    left: -10px;
+    transform: translate(-100%,-50%);
+    width: max-content;
+    text-align: right;
+}
+.label-right {
+    top: 50%;
+    right: -10px;
+    transform: translate(100%,-50%);
+    width: max-content;
+    text-align: left;
 }
 
+.card-container { /* Wrapper for card and its label */
+    position: relative; /* Crucial for absolute positioning of the label */
+    width: 120px; /* Match card width */
+    margin-bottom: 30px; /* Space for label */
+}
+
+/* --- Keyframe Animations --- */
+@keyframes dealAppear {
+    from {
+        opacity: 0;
+        transform: translateY(20px); /* Optional: Slight move up */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes cardFlip {
+    from {
+        transform: rotateY(0deg);
+    }
+    to {
+        transform: rotateY(180deg);
+    }
+}
+
+/* Card Styling & Animation */
 .card {
-    width: 100%;
-    height: 100%;
+    width: 120px;
+    height: 210px;
     position: relative;
     transform-style: preserve-3d;
-    transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
-    border: 1px solid #00FF00;
-    border-radius: 5px;
-    box-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+    opacity: 0; /* Start hidden, animation will make it visible */
+    transform: rotateY(0deg); /* Ensure initial state for flip */
+    cursor: default; /* Not interactive */
+    /* Assign animations based on classes added by JS */
+    /* animation-fill-mode: forwards; ensures styles persist after animation */
 }
 
-.card.flipped {
-    transform: rotateY(180deg);
+/* Class added by JS to trigger deal animation */
+.card.is-dealing {
+    animation: dealAppear 0.5s forwards;
+    animation-delay: var(--deal-delay, 0s); /* Use CSS variable set by JS */
+}
+
+.card-inner { /* Add this inner wrapper for the flip */
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+}
+
+/* Apply flip animation to the inner element when the parent card has .is-flipping */
+.card.is-flipping .card-inner {
+    animation: cardFlip 0.8s forwards;
+    animation-delay: var(--flip-delay, 0s); /* Use CSS variable set by JS */
 }
 
 .card-face {
@@ -269,314 +380,339 @@ button:disabled {
     width: 100%;
     height: 100%;
     backface-visibility: hidden; /* Hide the back side when facing away */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 10px;
     border-radius: 5px;
-    overflow: hidden;
-}
-
-.card-face.front {
-    background-color: #001a00; /* Dark green front */
-    transform: rotateY(180deg);
-}
-
-.card-face.back {
-    background-color: #000;
-    background-image:
-        linear-gradient(45deg, #003300 25%, transparent 25%),
-        linear-gradient(-45deg, #003300 25%, transparent 25%),
-        linear-gradient(45deg, transparent 75%, #003300 75%),
-        linear-gradient(-45deg, transparent 75%, #003300 75%);
-    background-size: 20px 20px;
-    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    overflow: hidden; /* Ensure image fits */
     border: 1px solid #00FF00;
 }
 
-.card-image {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    display: block; /* Remove extra space below image */
-    opacity: 0.9; /* Slightly faded image */
+.card-front {
+    background-color: #000; /* Card back color */
+    transform: rotateY(0deg); /* Front face initially visible */
 }
 
-.card-orientation {
-    position: absolute;
-    bottom: 5px;
-    left: 5px;
-    font-size: 8px;
-    color: #FFFF00; /* Yellow for emphasis */
-    background-color: rgba(0, 0, 0, 0.7);
-    padding: 1px 3px;
-    border-radius: 2px;
+.card-back {
+    background-color: #eee; /* Placeholder, image will cover */
+    transform: rotateY(180deg); /* Back face starts rotated */
 }
 
-/* Card Label Styling */
-.card-label {
-    position: absolute;
-    bottom: -20px; /* Position below the card */
-    left: 0;
+.card-face img {
     width: 100%;
-    text-align: center;
-    font-size: 0.8em;
-    color: #00FF00;
-    padding: 2px 0;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    background: rgba(0,0,0,0.6);
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
-/* Adjust label position for specific layout needs if necessary */
-.label-left {
-    text-align: right;
-    left: auto;
-    right: 105%; /* Position to the left of the card */
-    bottom: 50%; /* Center vertically */
-    transform: translateY(50%);
-    width: auto; /* Allow width to adjust to content */
-    white-space: nowrap;
+.card.reversed .card-back img {
+    transform: rotate(180deg);
 }
 
-.label-right {
-    text-align: left;
-    left: 105%; /* Position to the right of the card */
-    bottom: 50%;
-    transform: translateY(50%);
-    width: auto;
-    white-space: nowrap;
+.interpretation-area,
+.stats-area {
+    min-height: 100px;
 }
 
-.label-above {
-    bottom: auto;
-    top: -20px; /* Position above the card */
-    left: 50%;
-    transform: translateX(-50%);
-    width: auto;
-    white-space: nowrap;
-}
-
-.interpretation-area {
-    max-height: 400px; /* Max height before scrolling */
-    overflow-y: auto; /* Scroll if content exceeds max height */
-}
-
-#interpretation-text {
-    white-space: pre-wrap; /* Preserve line breaks from API */
-    line-height: 1.6;
-}
-
-#loading-indicator {
-    display: none; /* Hidden by default */
-    text-align: center;
+#interpretationText,
+#statsText {
+    white-space: pre-wrap; /* Preserve formatting from server/stats */
     padding: 10px;
+    background-color: #000;
+    border: 1px dashed #008000; /* Dimmer green border */
+    margin-top: 10px;
+    min-height: 50px;
+    line-height: 1.4;
 }
 
-/* Stats Area */
-.stats-content {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+/* --- Main Layout --- */
+.main-content {
+    display: flex;
+    max-width: 1500px;
+    margin: 0 auto;
+    width: 100%;
+    gap: 20px;
+    align-items: flex-start;
+    box-sizing: border-box;
+    min-width: 1200px;
+}
+
+.left-panel {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.right-panel {
+    flex: 1 1 300px;
+    min-width: 300px;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.spread-area-wrapper {
+    flex: 1;
+    min-height: 350px;
+    max-width: 100%;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.interpretation-area,
+.stats-area {
+    flex: none !important; /* Override flex */
+    width: 100% !important; /* Force full width */
+    overflow-y: auto;
+    min-height: 200px;
+}
+
+.interpretation-area,
+.stats-area {
+    overflow-y: auto; /* Scroll within fixed box */
+    width: 100%;
+    box-sizing: border-box;
+    /* We will set height via JS */
+}
+
+/* Spread Buttons */
+.spread-buttons {
+    display: flex;
     gap: 10px;
-    padding-top: 10px;
+}
+.spread-button {
+    background-color: #000;
+    color: #00FF00;
+    border: 1px solid #00FF00;
+    padding: 6px 12px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s, transform 0.1s;
+}
+.spread-button.active {
+    background-color: #00FF00;
+    color: #000;
+    transform: scale(1.05);
+}
+.spread-button:hover {
+    background-color: #003300;
+    box-shadow: 0 0 8px #00FF00;
 }
 
-.stat-item {
-    border: 1px solid #005000;
-    padding: 5px;
-    background-color: rgba(0, 10, 0, 0.5);
+/* Enhanced panel styling */
+.interpretation-area,
+.stats-area {
+    background-color: rgba(0, 40, 0, 0.85);
+    border-radius: 5px;
+    padding: 20px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.7), 0 0 8px rgba(0,255,0,0.2);
 }
 
-.stat-item strong {
-    color: #50FF50;
+/* Tab interface styling */
+.tab-header {
+    border: 1px solid #00FF00;
+    padding: 5px 10px; /* Add some padding */
+    border-bottom: none; /* Remove bottom border if content has top border */
+    background-color: rgba(0, 20, 0, 0.8);
+    box-shadow: 0 0 5px #00FF00;
+    display: flex; /* Keep buttons aligned */
+    justify-content: center; /* Center buttons */
+    gap: 10px;
+    width: 100%; /* Ensure full width */
+    box-sizing: border-box; /* Ensure padding/border are inside width */
 }
 
-/* --- CRT Effects --- */
+.tab-button {
+    background-color: #000;
+    color: #00FF00;
+    border: 1px solid #00FF00;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+.tab-button.active {
+    background-color: #00FF00;
+    color: #000;
+}
+
+.tab-content {
+    padding: 0 15px; /* Keep horizontal padding, remove vertical */
+    border: 1px solid #00FF00;
+    border-top: none; /* Avoid double border with header */
+    background-color: rgba(0, 20, 0, 0.8);
+    box-shadow: 0 0 5px #00FF00;
+    width: 100%; /* Ensure full width */
+    box-sizing: border-box; /* Ensure padding/border are inside width */
+}
+
+/* Utility class to hide content */
+.hidden {
+    display: none !important;
+}
+
+/* CRT static noise overlay */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: 
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 100% 3px, 2px 100%;
+  animation: crt-noise 0.3s steps(2) infinite;
+  z-index: 1002; /* Bring scan lines to the forefront */
+}
+
+/* Screen glare overlay for CRT curvature */
 .container::before {
-    content: " ";
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-    z-index: 2;
-    background-size: 100% 2px, 3px 100%;
-    pointer-events: none;
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.05), transparent 60%);
+  z-index: 1001;
 }
 
-.container::after {
-    content: " ";
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    background: rgba(18, 16, 16, 0.1);
-    opacity: 0;
-    z-index: 2;
-    pointer-events: none;
-    animation: flicker 0.15s infinite;
-}
-
-@keyframes flicker {
-    0%   { opacity: 0.1; }
-    50%  { opacity: 0.2; }
-    100% { opacity: 0.1; }
-}
-
-/* Noise/Static Overlay */
-/* Add this as another pseudo-element or adjust existing ones */
-.noise-overlay {
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAUVBMVEWFhYWDg4N3d3dtbW17e3t1dXWBgYGHh4d5eXlzc3OLi4ubm5uVlZWPj4+NjY19fX2JiYl/f39ra2uRkZGZmZlpaWmXl5dvb29xcXGTk5NnZ2c8TV1mAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gcXABEwNjlqZQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAANCSURBVEiJzZZbfxtJFIjr+5+d+1dZ3+x+fI18gMJAwAQLgDwg83nGcALJkAl88gHhf/z/5xQf9nZ1dZYy+7z353nfd55+3xxF57i4wN5i3wXqJO4iT0v7z6u6UaF8K2a97pDkWxTfF7/F7q/1zX19P0fQ8e8V5iPqH6t6H0PveLq/f43+800sZvYv5bW746Y5+xY1U1tV72gwx3F0I7jP83+1+99p4w5+q66W1/fW949eJ0s/wM9Y1L8bXKvD4k/6P0/0O1L8tL+2683tJ3U//VMWdP0G/yO1U59t9K+f7+8/n5+Y89tN17iP6P7V2/h304h/2P9L87/1zX1+f3m9pfz/jvz39/3L/yM4p8v/+V+Vd3zJd/2L9v+f+wM9s/k3tP1n4Y33v19P0/9K8Puf+/P/+n++w47u4TfJ7f1/xPz9/wf94eP5P97/3Pz8/Pm6X19fXz//8uXy8/Pz56WdK/7y8vPzt6el5edn58vN59r81//f/z+v5+vr6+v7+/v3v7+/39/fPz+/v7++//8/f/+///38/f/+///8/f3//9///5+/v/+///+//5+fv7///3///3//Pz//f/9//39//39//39///8/f//8/f//+//5+fv7///3///9/vz+//3///5/vz//f//+//5///3//Pz//v/9//v//v/+v//+P/7//f/8/P/7//f39/f//8/f//8/v//9/f//8///7//P//+/v/+/P3/8/P//9///5/v//8//v//9/P//8//v//+//7//v//+//7//P3/8///7+///3///3//Pz//f/9//3//Pz9///7///3///3///7//v//+//7///7+///3//Pz//f/9//v//v//v//+///7//P//+///7///3///9///3///5+/v//+///7+/v//8///7///3///3///7+///3///3///3///7///3///3///7///3///3///3+v//+///7+////AAAAAElFTkSuQmCC'); /* Replace with actual noise pattern if needed */
-    opacity: 0.05;
-    pointer-events: none;
-    z-index: 3;
-    animation: crt-noise 0.08s infinite steps(2);
+/* Vignette effect around edges */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 50%, rgba(0,0,0,0.7) 100%);
+  z-index: 999;
 }
 
 @keyframes crt-noise {
-  0%, 100% { opacity: 0.05; }
-  50%      { opacity: 0.08; }
+  0%, 100% { opacity: 0.1; }
+  50%      { opacity: 0.2; }
 }
 
-/* Interpretation text specific glow */
-#interpretation-text {
-    text-shadow:
-        0 0 1px #00FF00,
-        0 0 3px #00FF00,
-        0 0 5px #00FF00;
+/* Card image in stats */
+.stat-card {
+    width: 40px;
+    height: auto;
+    margin-right: 8px;
+    vertical-align: middle;
+    filter: drop-shadow(0 0 3px #00FF00);
 }
 
-/* Fixed height/scroll for interpretation */
-.interpretation-area {
-    min-height: 150px; /* Minimum height */
-    /* max-height: 40vh; */ /* Adjust as needed, maybe based on viewport height */
+/* Fixed container for tabs to prevent page shift */
+.tab-content {
+    position: relative;
+    height: 350px; /* Fixed height for reading/stats area */
+}
+
+/* Layer panels within tab-content */
+.interpretation-area,
+.stats-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     overflow-y: auto; /* Scroll within fixed box */
 }
 
-/* == Responsive Design == */
-
-@media (max-width: 768px) { /* Breakpoint for tablets/large phones */
-
-    body {
-        padding: 5px; /* Reduce body padding */
+/* --- Responsive Design --- */
+@media (max-width: 767px) {
+    html, body {
+        overflow-x: hidden; /* Prevent entire page horizontal scroll */
     }
 
     .container {
-        padding: 10px; /* Reduce container padding */
-        gap: 10px;     /* Reduce gap between sections */
-        width: 100%;    /* Ensure it takes full width */
-        max-width: 100vw; /* Use viewport width */
-        min-height: auto; /* Let height adjust */
-        box-sizing: border-box; /* Ensure padding is included */
-        overflow-x: hidden; /* Prevent horizontal scroll on container */
+        padding: 10px;
+        gap: 15px;
+        width: auto; /* Allow container to shrink wrap content (within body flex center) */
+        max-width: 100%; /* Ensure it doesn't exceed screen width */
+        /* min-height: auto; */
+    }
+
+    h1 {
+        font-size: 1.5em;
     }
 
     .controls-area {
-        flex-direction: column; /* Stack controls vertically */
+        flex-direction: column;
         gap: 10px;
-        padding: 10px 5px; /* Reduced horizontal padding */
-    }
-
-    .spread-selector,
-    button {
-        width: 100%; /* Make controls fill container */
-        max-width: 350px; /* Slightly larger max-width, but full width first */
-        text-align: center;
-        box-sizing: border-box;
-        margin-left: auto; /* Center within flex column if max-width applies */
-        margin-right: auto; /* Center within flex column if max-width applies */
     }
 
     .spread-area-wrapper {
-        padding: 10px 0; /* Reduce padding, remove horizontal padding */
-        width: 100%; /* Ensure wrapper takes full width */
-        /* overflow-x: auto; */ /* REMOVED - Not needed for flex column */
+        overflow-x: auto; /* Should not be needed now, but keep as safety */
+        padding: 10px;
+        width: 100%;
         box-sizing: border-box;
     }
 
-    /* Adjust complex layouts - STACK THEM VERTICALLY */
+    /* --- Mobile Layout for Complex Spreads --- */
+    /* Stack cards vertically */
     .spread-area.celtic-cross-layout,
     .spread-area.horseshoe-layout {
-        display: flex; /* Change from block/absolute */
-        flex-direction: column; /* Stack vertically */
-        align-items: center; /* Center cards */
-        width: 100%; /* Take full width */
-        min-width: 0;
-        max-width: 100%;
-        height: auto; /* Let height adjust */
-        min-height: 0;
-        position: relative; /* Back to relative */
-        gap: 15px; /* Slightly reduced gap between cards */
-
-        /* Remove scaling and centering margins from previous attempt */
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center cards horizontally */
+        /* Remove scaling and fixed positioning rules */
         transform: none;
         transform-origin: initial;
-        margin-left: 0;
+        margin: 0; /* Reset margins */
+        width: auto;
+        min-width: 0;
+        min-height: 0;
+        position: relative; /* Keep relative for potential inner absolute elements if any */
+        gap: 20px; /* Add gap between stacked cards */
     }
 
     /* Reset card positioning within complex layouts for mobile */
     .spread-area.celtic-cross-layout .card-container,
     .spread-area.horseshoe-layout .card-container {
-        position: relative; /* No longer absolute */
+        position: relative; /* Keep relative for label */
         top: auto;
         left: auto;
-        transform: none !important; /* Remove any rotation/positioning */
-        margin-bottom: 10px; /* Consistent bottom margin */
-        width: 110px; /* Slightly smaller cards for tablet size */
+        transform: none !important; /* Override potential inline transforms? */
+        margin-bottom: 25px; /* Space between stacked cards + label */
+        width: 120px; /* Maintain card width */
     }
 
-}
-
-@media (max-width: 480px) { /* Further adjustments for small phones */
-    .container {
-        padding: 5px; /* Minimal container padding */
-        gap: 8px;
+    /* Ensure card container itself doesn't get unwanted margins */
+    .spread-area.celtic-cross-layout .card-container:nth-child(n),
+    .spread-area.horseshoe-layout .card-container:nth-child(n) {
+         margin-left: 0;
+         margin-right: 0;
     }
 
-    /* Make cards even smaller for phones */
-    .spread-area.celtic-cross-layout .card-container,
-    .spread-area.horseshoe-layout .card-container {
-        width: 100px; /* Smaller cards */
-        margin-bottom: 8px; /* Tighter margin */
+    /* --- Other Mobile Adjustments --- */
+    .position-label {
+        font-size: 0.8em; /* Smaller labels */
+        padding: 2px 4px;
+        /* Adjust position if needed for stacked layout */
+        bottom: -18px; /* Ensure it's below card */
+        top: auto;
+        left: 50%;
+        transform: translateX(-50%);
     }
 
-    .spread-area.celtic-cross-layout,
-    .spread-area.horseshoe-layout {
-        gap: 10px; /* Reduced gap for smaller screens */
+     /* Ensure labels don't overlap in stacked view */
+    .label-left, .label-right, .label-above {
+        /* Force labels below cards */
+        bottom: -18px; 
+        top: auto;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        width: 90%;
     }
 
-    /* Make sure interpretation is still usable */
     .interpretation-area {
-         min-height: 120px;
-         padding: 8px;
-    }
-
-     h1 { font-size: 1.2em; }
-     h2 { font-size: 1.0em; }
-     p, label, button, select { font-size: 0.8em; }
-
-    /* Further reduce card label size */
-    .card-label {
-        font-size: 0.6em;
-    }
-
-}
-
-/* Optional: Style scrollbars for the wrapper on mobile */
-@media (max-width: 768px) {
-    .spread-area-wrapper::-webkit-scrollbar {
-        height: 5px;
-        background-color: #001a00;
-    }
-    .spread-area-wrapper::-webkit-scrollbar-thumb {
-        background-color: #00FF00;
-        border-radius: 2px;
+        max-height: 40vh;
+        overflow-y: auto;
+        font-size: 0.9em;
     }
 }
