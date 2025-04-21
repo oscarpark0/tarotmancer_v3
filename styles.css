@@ -663,31 +663,41 @@ body::after {
     /* Adjust complex layouts */
     .spread-area.celtic-cross-layout,
     .spread-area.horseshoe-layout {
-        /* Remove fixed width that causes overflow on container */
-        width: auto;
-        min-width: auto;
-        max-width: none; /* Override previous max-width */
+        display: flex; /* Change from block/absolute */
+        flex-direction: column; /* Stack vertically */
+        align-items: center; /* Center cards */
+        width: 100%; /* Take full width */
+        min-width: 0;
+        max-width: 100%;
+        height: auto; /* Let height adjust */
+        min-height: 0;
+        position: relative; /* Back to relative */
+        gap: 20px; /* Add spacing between cards */
 
-        /* Apply scaling */
-        /* Initial widths are roughly 700px (horseshoe) and 670px (celtic) */
-        /* We scale relative to the original fixed size */
-        transform: scale(0.65); /* Adjust scale factor as needed */
-        transform-origin: top center; /* Scale from top center */
-        margin-left: -117px; /* approx (700px * (1 - 0.65) / 2) to re-center */
-
-        /* Adjust min-height to compensate for scaling */
-        /* Celtic: 750px * 0.65 = 487.5px */
-        /* Horseshoe: 600px * 0.65 = 390px */
-        /* Add some buffer */
+        /* Remove scaling and centering margins from previous attempt */
+        transform: none;
+        transform-origin: initial;
+        margin-left: 0;
     }
 
-    .spread-area.celtic-cross-layout {
-         min-height: 500px;
-         margin-left: -108px; /* approx (670px * (1 - 0.65) / 2) */
+    /* Reset card positioning within complex layouts for mobile */
+    .spread-area.celtic-cross-layout .card-container,
+    .spread-area.horseshoe-layout .card-container {
+        position: relative; /* No longer absolute */
+        top: auto;
+        left: auto;
+        transform: none !important; /* Remove any rotation/positioning */
+        margin-bottom: 10px; /* Consistent bottom margin */
+        width: 120px; /* Keep card size reasonable */
     }
-    .spread-area.horseshoe-layout {
-        min-height: 400px;
-        /* margin-left already set above */
+
+    /* Ensure specific position overrides are also reset */
+    .spread-area.celtic-cross-layout .card-container:nth-child(n),
+    .spread-area.horseshoe-layout .card-container:nth-child(n) {
+        top: auto;
+        left: auto;
+        position: relative;
+        transform: none !important;
     }
 
     /* Ensure interpretation area is clearly visible */
@@ -713,22 +723,6 @@ body::after {
     .container {
         padding: 5px;
         gap: 8px;
-    }
-
-    .spread-area.celtic-cross-layout,
-    .spread-area.horseshoe-layout {
-         transform: scale(0.45); /* Scale down even more */
-         /* Celtic: 750px * 0.45 = 337.5px */
-         /* Horseshoe: 600px * 0.45 = 270px */
-    }
-
-    .spread-area.celtic-cross-layout {
-         min-height: 350px;
-         margin-left: -184px; /* approx (670px * (1 - 0.45) / 2) */
-    }
-    .spread-area.horseshoe-layout {
-        min-height: 280px;
-        margin-left: -192px; /* approx (700px * (1 - 0.45) / 2) */
     }
 
     /* Make sure interpretation is still usable */
