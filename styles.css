@@ -10,7 +10,6 @@ body {
     /* Subtle Text Glow */
     text-shadow: 0 0 3px rgba(0, 255, 0, 0.4);
     display: flex; /* Use flexbox for overall layout */
-    justify-content: center;
 }
 
 .container {
