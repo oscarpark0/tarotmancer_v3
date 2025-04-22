@@ -693,19 +693,26 @@ body::after {
         flex-wrap: wrap;
     }
     
-    /* Adjust tab content height for mobile */
+    /* FIX: Adjust tab content for mobile scrolling */
     .tab-content {
-        height: auto;
-        min-height: 300px; /* Minimum height to see content */
+        position: relative;
+        height: 300px; /* Fixed height to enable scrolling */
+        overflow: hidden; /* Hide overflow but let children scroll */
     }
     
-    /* Make interpretation and stats areas position:static for mobile */
+    /* FIX: Make interpretation and stats areas scrollable on mobile */
     .interpretation-area,
     .stats-area {
-        position: static;
-        height: auto; 
-        min-height: 300px;
-        overflow-y: visible; /* Allow content to expand naturally */
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 100%;
+        overflow-y: auto !important; /* Force scrolling */
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        padding: 15px;
+        box-sizing: border-box;
     }
 
     /* --- Mobile Layout for Complex Spreads --- */
@@ -714,6 +721,7 @@ body::after {
         overflow-x: auto; /* Enable horizontal scrolling */
         max-width: 100%; /* Ensure it fits within container */
         padding: 5px; /* Reduce padding */
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
     }
     
     /* Scale the card layouts for mobile viewing */
