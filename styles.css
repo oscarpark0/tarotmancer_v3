@@ -396,40 +396,39 @@ button:disabled {
         width: 100%;
     }
 
-    /* Make spread area taller on mobile */
     .spread-area.celtic-cross-layout,
     .spread-area.horseshoe-layout {
-        aspect-ratio: 3 / 4;
-        min-height: 60vh;
+        aspect-ratio: 3 / 4.5;
+        min-height: 70vh;
     }
 
-    /* Adjust card size for complex spreads on mobile */
     .spread-area.celtic-cross-layout .card-container, 
     .spread-area.horseshoe-layout .card-container {
-        width: 24%; /* Slightly smaller to fit better */
+        width: 28%;
     }
 
-    /* --- Mobile Celtic Cross: Recalculated vertical layout --- */
-    .spread-area.celtic-cross-layout .card-container:nth-child(1) { top: 25%; left: 38%; z-index: 1; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(2) { top: 25%; left: 38%; transform: rotate(90deg); z-index: 2; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(3) { top: 45%; left: 38%; } /* Below */
-    .spread-area.celtic-cross-layout .card-container:nth-child(4) { top: 25%; left: 8%; }  /* Left */
-    .spread-area.celtic-cross-layout .card-container:nth-child(5) { top: 5%;  left: 38%; }  /* Above */
-    .spread-area.celtic-cross-layout .card-container:nth-child(6) { top: 25%; left: 68%; } /* Right */
-    /* Staff as a 2x2 grid below */
-    .spread-area.celtic-cross-layout .card-container:nth-child(7) { top: 68%; left: 15%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(8) { top: 68%; left: 45%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(9) { top: 85%; left: 15%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(10){ top: 85%; left: 45%; }
+    /* --- Mobile Celtic Cross: Symmetrical Layout --- */
+    .spread-area.celtic-cross-layout .card-container:nth-child(1) { top: 25%; left: 36%; z-index: 1; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(2) { top: 25%; left: 36%; transform: rotate(90deg); z-index: 2; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(3) { top: 48%; left: 36%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(4) { top: 25%; left: 5%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(5) { top: 2%;  left: 36%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(6) { top: 25%; left: 67%; }
+    /* Staff layout based on mathematical symmetry */
+    .spread-area.celtic-cross-layout .card-container:nth-child(7) { top: 70%; left: 15%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(8) { top: 70%; left: 57%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(9) { top: 86%; left: 15%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(10){ top: 86%; left: 57%; }
 
-    /* --- Mobile Horseshoe: Recalculated tighter, taller arc --- */
-    .spread-area.horseshoe-layout .card-container:nth-child(1) { top: 55%; left: 2%;  transform: rotate(-45deg); }
-    .spread-area.horseshoe-layout .card-container:nth-child(2) { top: 25%; left: 10%; transform: rotate(-25deg); }
-    .spread-area.horseshoe-layout .card-container:nth-child(3) { top: 5%;  left: 38%; }
-    .spread-area.horseshoe-layout .card-container:nth-child(4) { top: 25%; left: 66%; transform: rotate(25deg); }
-    .spread-area.horseshoe-layout .card-container:nth-child(5) { top: 55%; left: 74%; transform: rotate(45deg); }
-    .spread-area.horseshoe-layout .card-container:nth-child(6) { top: 75%; left: 55%; }
-    .spread-area.horseshoe-layout .card-container:nth-child(7) { top: 75%; left: 21%; }
+    /* --- Mobile Horseshoe: Symmetrical Layout --- */
+    .spread-area.horseshoe-layout .card-container:nth-child(1) { top: 60%; left: 5%;  transform: rotate(-50deg); }
+    .spread-area.horseshoe-layout .card-container:nth-child(2) { top: 30%; left: 10%; transform: rotate(-25deg); }
+    .spread-area.horseshoe-layout .card-container:nth-child(3) { top: 10%; left: 36%; }
+    .spread-area.horseshoe-layout .card-container:nth-child(4) { top: 30%; left: 62%; transform: rotate(25deg); }
+    .spread-area.horseshoe-layout .card-container:nth-child(5) { top: 60%; left: 67%; transform: rotate(50deg); }
+    /* Symmetrical bottom cards */
+    .spread-area.horseshoe-layout .card-container:nth-child(6) { top: 85%; left: 55%; }
+    .spread-area.horseshoe-layout .card-container:nth-child(7) { top: 85%; left: 17%; }
 
     .stats-row {
         grid-template-columns: 1fr;
