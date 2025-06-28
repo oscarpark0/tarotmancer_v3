@@ -475,7 +475,7 @@ function displayStats() {
                 sortedCards.forEach(([cardId, count]) => {
                     const cardInfo = deck.find(c => c.id === cardId);
                     const cardName = cardInfo ? cardInfo.name : cardId;
-                    statsHtml += `<li><img src="${cardInfo.image_url}" alt="${cardName}" class="stat-card"/> ${cardName}: ${count}</li>`;
+                    statsHtml += `<li><img src="${cardInfo.image_url}" alt="${cardName}" class="stats-card-img"/> ${cardName}: ${count}</li>`;
                 });
                 statsHtml += `</ul></li>`;
             }

@@ -167,7 +167,7 @@ button:disabled {
 .spread-area.horseshoe-layout .card-container {
     position: absolute;
     /* Card size relative to the container */
-    width: 16%;
+    width: 14%; /* Reduced from 16% */
     height: auto;
     aspect-ratio: 120 / 200; /* Maintain card proportions */
 }
@@ -295,6 +295,18 @@ button:disabled {
 
 .hidden {
     display: none;
+}
+
+#interpretationArea #interpretButton {
+    margin-bottom: 15px; /* Add space between button and text */
+}
+
+.stats-card-img {
+    width: 40px;
+    height: auto;
+    vertical-align: middle;
+    margin-right: 10px;
+    border-radius: 3px;
 }
 
 #interpretationText,
