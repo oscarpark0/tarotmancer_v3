@@ -42,20 +42,26 @@ module.exports = async (req, res) => {
         res.status(200).json(response.data);
 
     } catch (error) {
-        console.error('Error calling Anthropic API:', error.response ? error.response.data : error.message);
+        console.error('Error calling Anthropic API:', error);
 
-        if (error.isAxiosError) {
-             if (error.code === 'ECONNABORTED') {
+        if (error.response) {
+            // The request was made and the server responded with a status code
+            // that falls out of the range of 2xx
+            console.error('API Error Data:', error.response.data);
+            console.error('API Error Status:', error.response.status);
+            const errorMessage = error.response.data?.error?.message || 'An error occurred with the interpretation service.';
+            return res.status(error.response.status || 500).json({ error: errorMessage });
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.error('API No Response:', error.request);
+            if (error.code === 'ECONNABORTED') {
                 return res.status(504).json({ error: 'Request to interpretation service timed out.' });
             }
-             return res.status(502).json({ error: 'Could not connect to interpretation service.' });
+            return res.status(502).json({ error: 'Could not connect to interpretation service. No response received.' });
+        } else {
+            // Something happened in setting up the request that triggered an Error
+            console.error('Axios Setup Error:', error.message);
+            return res.status(500).json({ error: 'An unexpected error occurred while preparing the interpretation request.' });
         }
-        
-        if (error.response && error.response.data && error.response.data.error) {
-             const statusCode = error.response.status || 500;
-             return res.status(statusCode).json({ error: error.response.data.error.message || 'Error processing interpretation request.' });
-        }
-        
-        res.status(500).json({ error: 'An unexpected error occurred while getting the interpretation.' });
     }
 };
