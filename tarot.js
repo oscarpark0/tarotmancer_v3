@@ -140,13 +140,23 @@ function dealSpread(numCards) {
 }
 
 function displaySpread(spread) {
-    spreadArea.innerHTML = ''; 
+    // This function assumes the spreadArea is already cleared.
     const cardElements = []; 
     spread.forEach((card, index) => {
         const cardContainer = document.createElement('div');
         cardContainer.classList.add('card-container');
 
         const cardElement = document.createElement('div');
+        cardElement.classList.add('card');
+
+        // Set animation delays using CSS custom properties for consistency
+        const dealDelay = index * DEAL_STAGGER_DELAY;
+        const flipDelay = dealDelay + FLIP_DELAY_AFTER_DEAL_START;
+        cardElement.style.setProperty('--deal-delay', `${dealDelay}ms`);
+        cardElement.style.setProperty('--flip-delay', `${flipDelay}ms`);
+
+        const cardInner = document.createElement('div');
+        cardInner.classList.add('card-inner');
 
         const cardFront = document.createElement('div');
         cardFront.classList.add('card-face', 'card-front');
@@ -162,15 +172,10 @@ function displaySpread(spread) {
         backImg.alt = card.name;
         cardBack.appendChild(backImg);
 
-        const cardInner = document.createElement('div');
-        cardInner.classList.add('card-inner');
-
         cardInner.appendChild(cardFront);
         cardInner.appendChild(cardBack);
-
         cardElement.appendChild(cardInner);
 
-        cardElement.classList.add('card');
         if (card.isReversed) {
             cardElement.classList.add('reversed');
         }
@@ -180,27 +185,15 @@ function displaySpread(spread) {
         positionLabel.textContent = card.position;
 
         if (currentSpreadType === 'celticCross') {
-            // index: 0-based
-            if (index === 0 || index === 1 || index === 2) {
-                // Center cross cards (present, challenge, below) - label below
-                positionLabel.classList.add('label-below');
-            } else if (index === 3) {
-                // Recent Past (Card 4) - label below
+            if (index <= 2 || index === 3 || index === 5) {
                 positionLabel.classList.add('label-below');
             } else if (index === 4) {
-                // Above card (best outcome) - label-above
                 positionLabel.classList.add('label-above');
-            } else if (index === 5) {
-                // Near Future (Card 6) - label below
-                positionLabel.classList.add('label-below');
-            } else if (index === 6 || index === 7 || index === 8 || index === 9) {
-                // Staff cards (vertical stack) - label right
+            } else if (index >= 6) {
                 positionLabel.classList.add('label-right');
             }
         } else if (currentSpreadType === 'horseshoe') {
-            if (index === 2) {
-                positionLabel.classList.add('label-above');
-            } else if (index === 5 || index === 6) {
+            if (index === 2 || index === 5 || index === 6) {
                  positionLabel.classList.add('label-above');
             } else {
                 positionLabel.classList.add('label-below');
@@ -213,27 +206,19 @@ function displaySpread(spread) {
         cardContainer.appendChild(positionLabel);
 
         spreadArea.appendChild(cardContainer);
-        cardElements.push(cardElement); // Store the card element itself for animation
+        cardElements.push(cardElement);
     });
 
     scaleSpreadArea();
-    scaleSpreadArea();
+    scaleSpreadArea(); // Call twice to ensure proper scaling after DOM update
 
-    setTimeout(() => {
-        cardElements.forEach((cardEl, index) => {
-            const dealStartTime = index * DEAL_STAGGER_DELAY;
-            const flipStartTime = dealStartTime + FLIP_DELAY_AFTER_DEAL_START;
-            setTimeout(() => {
-                cardEl.style.setProperty('--deal-delay', '0s');
-                cardEl.classList.add('is-dealing');
-            }, dealStartTime);
-
-            setTimeout(() => {
-                cardEl.style.setProperty('--flip-delay', '0s');
-                cardEl.classList.add('is-flipping');
-            }, flipStartTime);
+    // Use requestAnimationFrame to ensure the DOM is updated before adding animation classes.
+    requestAnimationFrame(() => {
+        cardElements.forEach((cardEl) => {
+            // Add classes to trigger the animations. The delays are handled by the CSS variables.
+            cardEl.classList.add('is-dealing', 'is-flipping');
         });
-    }, 10); 
+    });
 }
 
 function scaleSpreadArea() {
@@ -299,61 +284,49 @@ function handleDealSpread() {
     }
 
     interpretButton.disabled = true;
-    interpretationText.textContent = ''; 
+    interpretationText.textContent = '';
 
-    spreadArea.classList.remove('celtic-cross-layout', 'horseshoe-layout'); 
+    // Clear previous spread and classes
+    spreadArea.innerHTML = '';
+    spreadArea.classList.remove('celtic-cross-layout', 'horseshoe-layout');
+
+    // Add class for the new spread layout
     if (currentSpreadType === 'celticCross') {
         spreadArea.classList.add('celtic-cross-layout');
-    } else if (currentSpreadType === 'horseshoe') { 
+    } else if (currentSpreadType === 'horseshoe') {
         spreadArea.classList.add('horseshoe-layout');
     }
 
-    scaleSpreadArea();
+    const spreadInfo = spreadDefinitions[currentSpreadType];
+    if (!spreadInfo) {
+        console.error(`Invalid spread type: ${currentSpreadType}`);
+        return;
+    }
 
-    const existingCards = spreadArea.querySelectorAll('.card');
-    existingCards.forEach(cardEl => {
-        cardEl.classList.remove('is-dealing', 'is-flipping', 'reversed');
-        cardEl.style.removeProperty('--deal-delay');
-        cardEl.style.removeProperty('--flip-delay');
-    });
+    const shuffledDeck = shuffleDeck([...deck]);
+    const drawnCards = shuffledDeck.slice(0, spreadInfo.count);
+
+    currentSpread = drawnCards.map((card, index) => ({
+        ...card,
+        isReversed: Math.random() < 0.5,
+        position: spreadInfo.positions[index] || `Card ${index + 1}`
+    }));
+
+    displaySpread(currentSpread);
+    updateStats(currentSpreadType, currentSpread);
+    saveStats();
+    displayStats();
+
+    // Enable the interpret button after the animations have completed.
+    const maxDealDelay = (spreadInfo.count - 1) * DEAL_STAGGER_DELAY;
+    const flipStartTime = maxDealDelay + FLIP_DELAY_AFTER_DEAL_START;
+    const FLIP_ANIMATION_DURATION = 800; // This should match the CSS transition duration for the flip
+    const totalAnimationTime = flipStartTime + FLIP_ANIMATION_DURATION;
+
     setTimeout(() => {
-        spreadArea.innerHTML = '';
         interpretationText.textContent = 'Spread dealt. Click "Get Interpretation".';
-        interpretButton.disabled = true;
-        currentSpread = [];
-
-        const spreadInfo = spreadDefinitions[currentSpreadType];
-
-        if (!spreadInfo) {
-            console.error(`Invalid spread type: ${currentSpreadType}`);
-            return;
-        }
-
-        const shuffledDeck = shuffleDeck([...deck]);
-        const drawnCards = shuffledDeck.slice(0, spreadInfo.count);
-
-        currentSpread = drawnCards.map((card, index) => ({
-            ...card,
-            isReversed: Math.random() < 0.5,    
-            position: spreadInfo.positions[index] || `Card ${index + 1}`
-        }));
-
-        displaySpread(currentSpread);
-        updateStats(currentSpreadType, currentSpread);
-        saveStats();
-        displayStats();
-
-        const maxDealDelay = (spreadInfo.count - 1) * DEAL_STAGGER_DELAY;
-        const lastDealFinishTime = maxDealDelay + 500;
-        const lastFlipStartTime = maxDealDelay + FLIP_DELAY_AFTER_DEAL_START;
-        const lastFlipFinishTime = lastFlipStartTime + 800;
-        const totalAnimationTime = Math.max(lastDealFinishTime, lastFlipFinishTime);
-
-        setTimeout(() => {
-             interpretButton.disabled = false;
-        }, totalAnimationTime);
-
-    }, 50); 
+        interpretButton.disabled = false;
+    }, totalAnimationTime);
 }
 
 async function handleGetInterpretation() {
