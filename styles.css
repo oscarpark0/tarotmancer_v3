@@ -407,18 +407,21 @@ button:disabled {
         width: 28%;
     }
 
-    /* --- Mobile Celtic Cross: Symmetrical Layout --- */
-    .spread-area.celtic-cross-layout .card-container:nth-child(1) { top: 25%; left: 36%; z-index: 1; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(2) { top: 25%; left: 36%; transform: rotate(90deg); z-index: 2; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(3) { top: 48%; left: 36%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(4) { top: 25%; left: 5%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(5) { top: 2%;  left: 36%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(6) { top: 25%; left: 67%; }
-    /* Staff layout based on mathematical symmetry */
-    .spread-area.celtic-cross-layout .card-container:nth-child(7) { top: 70%; left: 15%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(8) { top: 70%; left: 57%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(9) { top: 86%; left: 15%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(10){ top: 86%; left: 57%; }
+    /* --- Mobile Celtic Cross: Staff on the right --- */
+    .spread-area.celtic-cross-layout .card-container { width: 24%; } /* Adjust size for new layout */
+
+    .spread-area.celtic-cross-layout .card-container:nth-child(1) { top: 40%; left: 25%; z-index: 1; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(2) { top: 40%; left: 25%; transform: rotate(90deg); z-index: 2; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(3) { top: 65%; left: 25%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(4) { top: 40%; left: 0; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(5) { top: 15%; left: 25%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(6) { top: 40%; left: 50%; }
+
+    /* Staff positioned vertically to the right */
+    .spread-area.celtic-cross-layout .card-container:nth-child(7) { top: 75%; left: 75%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(8) { top: 50%; left: 75%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(9) { top: 25%; left: 75%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(10){ top: 0%;  left: 75%; }
 
     /* --- Mobile Horseshoe: Symmetrical Layout --- */
     .spread-area.horseshoe-layout .card-container:nth-child(1) { top: 60%; left: 5%;  transform: rotate(-50deg); }
