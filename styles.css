@@ -380,6 +380,62 @@ button:disabled {
     font-size: 0.9em;
 }
 
+/* === RESPONSIVE DESIGN FOR MOBILE === */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .controls-area {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .spread-selector, .action-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    /* Increase card size for complex spreads on mobile */
+    .spread-area.celtic-cross-layout .card-container, 
+    .spread-area.horseshoe-layout .card-container {
+        width: 28%; /* Larger cards on mobile */
+    }
+
+    /* --- Mobile Celtic Cross: More vertical layout --- */
+    .spread-area.celtic-cross-layout .card-container:nth-child(1) { top: 25%; left: 36%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(2) { top: 25%; left: 36%; transform: rotate(90deg); }
+    .spread-area.celtic-cross-layout .card-container:nth-child(3) { top: 50%; left: 36%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(4) { top: 25%; left: 5%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(5) { top: 0%;  left: 36%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(6) { top: 25%; left: 67%; }
+    /* Staff below the cross */
+    .spread-area.celtic-cross-layout .card-container:nth-child(7) { top: 75%; left: 5%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(8) { top: 75%; left: 36%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(9) { top: 75%; left: 67%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(10){ top: 50%; left: 5%; }
+
+    /* --- Mobile Horseshoe: Tighter, taller arc --- */
+    .spread-area.horseshoe-layout .card-container:nth-child(1) { top: 40%; left: 5%;  transform: rotate(-35deg); }
+    .spread-area.horseshoe-layout .card-container:nth-child(2) { top: 15%; left: 20%; transform: rotate(-20deg); }
+    .spread-area.horseshoe-layout .card-container:nth-child(3) { top: 5%;  left: 45%; }
+    .spread-area.horseshoe-layout .card-container:nth-child(4) { top: 15%; left: 70%; transform: rotate(20deg); }
+    .spread-area.horseshoe-layout .card-container:nth-child(5) { top: 40%; left: 85%; transform: rotate(35deg); }
+    .spread-area.horseshoe-layout .card-container:nth-child(6) { top: 70%; left: 65%; }
+    .spread-area.horseshoe-layout .card-container:nth-child(7) { top: 70%; left: 25%; }
+
+    .stats-row {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    .stats-card-info {
+        justify-content: center;
+    }
+    .stats-count {
+        text-align: center;
+    }
+}
+
 /* === CRT/SCANLINE EFFECTS === */
 body::after {
     content: "";
