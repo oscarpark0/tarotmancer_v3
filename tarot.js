@@ -1,4 +1,3 @@
-// --- DOM Elements ---
 const dealButton = document.getElementById('dealButton');
 const interpretButton = document.getElementById('interpretButton');
 const spreadArea = document.getElementById('spreadArea');
@@ -6,26 +5,23 @@ const spreadAreaWrapper = document.getElementById('spreadAreaWrapper');
 const interpretationArea = document.getElementById('interpretationArea');
 const interpretationText = document.getElementById('interpretationText');
 const statsText = document.getElementById('statsText');
-const statsArea = document.getElementById('statsArea'); // ADDED Reference
+const statsArea = document.getElementById('statsArea');
 
-// --- State Variables ---
 let deck = [];
-let currentSpread = []; // Array of card objects, will include isReversed state
-let currentSpreadType = 'threeCard'; // Default spread
-let stats = {}; // { spreadType: { positionName: { cardName: count } } }
-const INTERPRET_API_URL = '/interpret'; // Our local backend endpoint
+let currentSpread = [];
+let currentSpreadType = 'threeCard';
+let stats = {};
+const INTERPRET_API_URL = '/interpret';
 const CARD_BACK_URL = 'https://ik.imagekit.io/tarotmancer/cardback.webp';
 
-// --- Animation Constants ---
-const DEAL_STAGGER_DELAY = 150; // ms delay between each card starting its deal animation
-const FLIP_DELAY_AFTER_DEAL_START = 500; // ms after a card starts dealing before it starts flipping
-const CELTIC_CROSS_BASE_WIDTH = 700; // Base width needed for Celtic Cross layout (px)
-const CELTIC_CROSS_BASE_HEIGHT = 750; // Base height needed for Celtic Cross layout (px)
-const HORSESHOE_BASE_WIDTH = 700; // Base width for Horseshoe (px)
-const HORSESHOE_BASE_HEIGHT = 600; // Base height for Horseshoe (px)
-const DEFAULT_SPREAD_AREA_MIN_HEIGHT = '250px'; // Default min-height from CSS
+const DEAL_STAGGER_DELAY = 150;
+const FLIP_DELAY_AFTER_DEAL_START = 500;
+const CELTIC_CROSS_BASE_WIDTH = 700;
+const CELTIC_CROSS_BASE_HEIGHT = 750;
+const HORSESHOE_BASE_WIDTH = 700;
+const HORSESHOE_BASE_HEIGHT = 600;
+const DEFAULT_SPREAD_AREA_MIN_HEIGHT = '250px';
 
-// --- Spread Definitions ---
 const spreadDefinitions = {
     threeCard: {
         name: '3 Card Spread',
@@ -49,21 +45,17 @@ const spreadDefinitions = {
             '1. Past', '2. Present', '3. Future', '4. Obstacles', '5. Advice', '6. External Influences', '7. Outcome'
         ]
     }
-    // Add more spreads here in the future
 };
 
-// --- Initialization ---
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('DOM fully loaded and parsed');
     await loadDeck();
-    loadStats(); // Load stats from localStorage
-    displayStats(); // Display initial stats
+    loadStats();
+    displayStats();
     setupEventListeners();
     setupResizeObserver();
 });
 
-// --- Functions (will be added below) ---
-// Function to load deck data
 async function loadDeck() {
     console.log('Loading deck...');
     try {
@@ -72,28 +64,24 @@ async function loadDeck() {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        // Convert the object into an array of card objects, including the key (filename)
         deck = Object.entries(data).map(([key, cardData]) => ({
             id: key,
             ...cardData,
-            name: cardData.name || key.replace(/_/g, ' ') // Use name field, fallback to key
+            name: cardData.name || key.replace(/_/g, ' ')
         }));
         console.log(`Deck loaded with ${deck.length} cards.`);
-        // Enable deal button once deck is loaded
         if (dealButton) {
             dealButton.disabled = false;
         }
     } catch (error) {
         console.error('Error loading deck:', error);
         spreadArea.textContent = 'Error loading tarot deck. Please check console.';
-        if (dealButton) dealButton.disabled = true; // Keep disabled if load fails
+        if (dealButton) dealButton.disabled = true;
     }
 }
 
-// Function to set up event listeners
 function setupEventListeners() {
     console.log('Setting up event listeners...');
-    // Handle spread selection via buttons
     const spreadButtons = document.querySelectorAll('.spread-button');
     spreadButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -115,7 +103,6 @@ function setupEventListeners() {
         console.error('Interpret button not found');
     }
 
-    // Tab switching logic
     const tabButtons = document.querySelectorAll('.tab-button');
     tabButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -128,53 +115,39 @@ function setupEventListeners() {
     });
 }
 
-// Fisher-Yates (Knuth) Shuffle using Crypto API for randomness
 function shuffleDeck(array) {
     let currentIndex = array.length;
     const randomValues = new Uint32Array(currentIndex);
     crypto.getRandomValues(randomValues);
-
-    // While there remain elements to shuffle.
     while (currentIndex !== 0) {
-        // Pick a remaining element using a crypto-random index.
         let randomIndex = randomValues[currentIndex - 1] % currentIndex;
         currentIndex--;
-
-        // And swap it with the current element.
         [array[currentIndex], array[randomIndex]] = [
             array[randomIndex], array[currentIndex]];
     }
     return array;
 }
 
-// Function to deal a specified number of cards
 function dealSpread(numCards) {
     console.log(`Dealing ${numCards} cards...`);
     if (deck.length < numCards) {
         console.error('Not enough cards in deck to deal spread.');
-        // Optionally reshuffle or handle error
-        shuffleDeck(); // Simple reshuffle for now
-        if (deck.length < numCards) return; // Still not enough
+        shuffleDeck();
+        if (deck.length < numCards) return;
     }
     currentSpread = deck.slice(0, numCards);
     console.log('Spread dealt:', currentSpread.map(card => card.name));
 }
 
-// Function to display the dealt cards on the page with flip animation
 function displaySpread(spread) {
-    spreadArea.innerHTML = ''; // Clear previous spread
-    const cardElements = []; // Store card elements for sequenced animation
-
-    // Build the card elements and containers first
+    spreadArea.innerHTML = ''; 
+    const cardElements = []; 
     spread.forEach((card, index) => {
-        // Create Container
         const cardContainer = document.createElement('div');
         cardContainer.classList.add('card-container');
 
-        // Create the card element itself
         const cardElement = document.createElement('div');
 
-        // Create the card front and back faces
         const cardFront = document.createElement('div');
         cardFront.classList.add('card-face', 'card-front');
         const frontImg = document.createElement('img');
@@ -189,29 +162,23 @@ function displaySpread(spread) {
         backImg.alt = card.name;
         cardBack.appendChild(backImg);
 
-        // *** NEW: Create the inner wrapper for 3D flip ***
         const cardInner = document.createElement('div');
         cardInner.classList.add('card-inner');
 
-        // Append faces to the inner wrapper
         cardInner.appendChild(cardFront);
         cardInner.appendChild(cardBack);
 
-        // Append inner wrapper to the card element
         cardElement.appendChild(cardInner);
 
-        // Set card classes (including reversed state)
         cardElement.classList.add('card');
         if (card.isReversed) {
             cardElement.classList.add('reversed');
         }
 
-        // Create Position Label
         const positionLabel = document.createElement('div');
         positionLabel.classList.add('position-label');
-        positionLabel.textContent = card.position; // Use position from spread data
+        positionLabel.textContent = card.position;
 
-        // Assign label position for Celtic Cross
         if (currentSpreadType === 'celticCross') {
             // index: 0-based
             if (index === 0 || index === 1 || index === 2) {
@@ -230,64 +197,52 @@ function displaySpread(spread) {
                 // Staff cards (vertical stack) - label right
                 positionLabel.classList.add('label-right');
             }
-        } else if (currentSpreadType === 'horseshoe') { // ADDED HORSESHOE LOGIC
-            // index: 0-based (Past, Present, Future, Obstacles, Advice, External, Outcome)
-            if (index === 2) { // Future (Top card)
+        } else if (currentSpreadType === 'horseshoe') {
+            if (index === 2) {
                 positionLabel.classList.add('label-above');
-            } else if (index === 5 || index === 6) { // External, Outcome (Bottom cards)
-                 positionLabel.classList.add('label-above'); // Place above bottom cards
-            } else { // Past, Present, Obstacles, Advice (Side cards)
+            } else if (index === 5 || index === 6) {
+                 positionLabel.classList.add('label-above');
+            } else {
                 positionLabel.classList.add('label-below');
             }
         } else {
-            // Default: label below for other spreads
             positionLabel.classList.add('label-below');
         }
 
-        // Append card and label to container
         cardContainer.appendChild(cardElement);
         cardContainer.appendChild(positionLabel);
 
-        // Append container to spread area
         spreadArea.appendChild(cardContainer);
         cardElements.push(cardElement); // Store the card element itself for animation
     });
 
-    // Scale the spread area after layout classes are applied
+    scaleSpreadArea();
     scaleSpreadArea();
 
-    // IMPORTANT: Delay adding animation classes slightly
-    // This allows the browser to render the initial state first, ensuring transitions work consistently
     setTimeout(() => {
-        // Trigger animations with calculated delays using global constants
         cardElements.forEach((cardEl, index) => {
             const dealStartTime = index * DEAL_STAGGER_DELAY;
             const flipStartTime = dealStartTime + FLIP_DELAY_AFTER_DEAL_START;
-
-            // Set timeout for the deal animation (adding .is-dealing class)
             setTimeout(() => {
-                cardEl.style.setProperty('--deal-delay', '0s'); // Delay handled by setTimeout
+                cardEl.style.setProperty('--deal-delay', '0s');
                 cardEl.classList.add('is-dealing');
             }, dealStartTime);
 
-            // Set timeout for the flip animation (adding .is-flipping class)
             setTimeout(() => {
-                cardEl.style.setProperty('--flip-delay', '0s'); // Delay handled by setTimeout
+                cardEl.style.setProperty('--flip-delay', '0s');
                 cardEl.classList.add('is-flipping');
             }, flipStartTime);
         });
-    }, 10); // Putting the delay back - might still help consistency
+    }, 10); 
 }
 
-// --- New Function to Scale Spread Area ---
 function scaleSpreadArea() {
-    if (!spreadArea || !spreadAreaWrapper || !interpretationArea || !statsArea) return; // Updated checks
+    if (!spreadArea || !spreadAreaWrapper || !interpretationArea || !statsArea) return;
 
-    const availableWidth = spreadAreaWrapper.clientWidth - 30; // Subtract padding (15px each side)
+    const availableWidth = spreadAreaWrapper.clientWidth - 30; 
     let scaleFactor = 1;
     let baseHeight = DEFAULT_SPREAD_AREA_MIN_HEIGHT;
 
-    // Reset transform and base height first
     spreadArea.style.transform = 'scale(1)';
 
     if (currentSpreadType === 'celticCross') {
@@ -296,7 +251,7 @@ function scaleSpreadArea() {
             scaleFactor = availableWidth / CELTIC_CROSS_BASE_WIDTH;
             spreadArea.style.transform = `scale(${scaleFactor})`;
         }
-    } else if (currentSpreadType === 'horseshoe') { // ADDED Horseshoe Scaling
+    } else if (currentSpreadType === 'horseshoe') {
         baseHeight = `${HORSESHOE_BASE_HEIGHT}px`;
         if (availableWidth < HORSESHOE_BASE_WIDTH) {
             scaleFactor = availableWidth / HORSESHOE_BASE_WIDTH;
@@ -304,8 +259,6 @@ function scaleSpreadArea() {
         }
     }
 
-    // Set min-height based on spread type and scaling
-    // If scaled, height adjusts proportionally. If not scaled, use base height.
     if (scaleFactor < 1) {
          const scaledHeight = (currentSpreadType === 'celticCross' ? CELTIC_CROSS_BASE_HEIGHT : HORSESHOE_BASE_HEIGHT) * scaleFactor;
          spreadArea.style.minHeight = `${scaledHeight}px`;
@@ -315,12 +268,11 @@ function scaleSpreadArea() {
 
     console.log(`Spread Area Scaled: Type=${currentSpreadType}, AvailableWidth=${availableWidth}, Scale=${scaleFactor.toFixed(2)}, MinHeight=${spreadArea.style.minHeight}`);
 
-    // --- Match Interpretation/Stats Area Height to Spread Wrapper Height ---
     requestAnimationFrame(() => {
         const wrapperHeight = spreadAreaWrapper.offsetHeight;
-        if (wrapperHeight > 0) { // Ensure we have a valid height
+        if (wrapperHeight > 0) { 
             interpretationArea.style.height = `${wrapperHeight}px`;
-            statsArea.style.height = `${wrapperHeight}px`; // Apply to stats area too
+            statsArea.style.height = `${wrapperHeight}px`; 
             console.log(`Interpretation/Stats area height set to: ${wrapperHeight}px`);
         } else {
             console.warn('Could not get valid spreadAreaWrapper height.');
@@ -328,12 +280,10 @@ function scaleSpreadArea() {
     });
 }
 
-// --- Setup Resize Observer ---
 function setupResizeObserver() {
     if (!spreadAreaWrapper) return;
 
     const resizeObserver = new ResizeObserver(entries => {
-        // We only observe one element, so entries[0] is fine
         scaleSpreadArea();
     });
 
@@ -341,7 +291,6 @@ function setupResizeObserver() {
     console.log('ResizeObserver set up for spreadAreaWrapper');
 }
 
-// --- Placeholder functions for dealing and interpretation (to be implemented) ---
 function handleDealSpread() {
     console.log(`Dealing spread: ${currentSpreadType}`);
     if (deck.length === 0) {
@@ -350,35 +299,28 @@ function handleDealSpread() {
     }
 
     interpretButton.disabled = true;
-    interpretationText.textContent = ''; // Clear previous interpretation
+    interpretationText.textContent = ''; 
 
-    // Add/Remove specific layout class based on spread type
-    spreadArea.classList.remove('celtic-cross-layout', 'horseshoe-layout'); // Reset both
+    spreadArea.classList.remove('celtic-cross-layout', 'horseshoe-layout'); 
     if (currentSpreadType === 'celticCross') {
         spreadArea.classList.add('celtic-cross-layout');
-    } else if (currentSpreadType === 'horseshoe') { // ADDED
+    } else if (currentSpreadType === 'horseshoe') { 
         spreadArea.classList.add('horseshoe-layout');
     }
 
-    // Call scale immediately after potentially adding/removing layout class
     scaleSpreadArea();
 
-    // --- Animation Reset --- 
-    // Attempt to force reset animations on existing cards before removing
     const existingCards = spreadArea.querySelectorAll('.card');
     existingCards.forEach(cardEl => {
         cardEl.classList.remove('is-dealing', 'is-flipping');
-        cardEl.style.removeProperty('--deal-delay'); // Clear CSS variables too
+        cardEl.style.removeProperty('--deal-delay');
         cardEl.style.removeProperty('--flip-delay');
-        // Force reflow might not be needed if we delay adding classes later
-        // void cardEl.offsetWidth; 
     });
-    // Give a tiny moment for the removal to register before clearing
     setTimeout(() => {
-        spreadArea.innerHTML = ''; // Clear previous spread visually
+        spreadArea.innerHTML = '';
         interpretationText.textContent = 'Spread dealt. Click "Get Interpretation".';
-        interpretButton.disabled = true; // Disable until cards are shown/flipped
-        currentSpread = []; // Clear logical spread
+        interpretButton.disabled = true;
+        currentSpread = [];
 
         const spreadInfo = spreadDefinitions[currentSpreadType];
 
@@ -392,7 +334,7 @@ function handleDealSpread() {
 
         currentSpread = drawnCards.map((card, index) => ({
             ...card,
-            isReversed: Math.random() < 0.5, // random orientation per card
+            isReversed: Math.random() < 0.5,    
             position: spreadInfo.positions[index] || `Card ${index + 1}`
         }));
 
@@ -401,20 +343,17 @@ function handleDealSpread() {
         saveStats();
         displayStats();
 
-        // Enable interpretation button after a delay (e.g., after flip animation might finish)
-        // Adjust timing based on animation duration using global constants
-        // Keyframe durations: deal=0.5s, flip=0.8s
         const maxDealDelay = (spreadInfo.count - 1) * DEAL_STAGGER_DELAY;
-        const lastDealFinishTime = maxDealDelay + 500; // Deal animation duration = 500ms
+        const lastDealFinishTime = maxDealDelay + 500;
         const lastFlipStartTime = maxDealDelay + FLIP_DELAY_AFTER_DEAL_START;
-        const lastFlipFinishTime = lastFlipStartTime + 800; // Flip animation duration = 800ms
+        const lastFlipFinishTime = lastFlipStartTime + 800;
         const totalAnimationTime = Math.max(lastDealFinishTime, lastFlipFinishTime);
 
         setTimeout(() => {
              interpretButton.disabled = false;
         }, totalAnimationTime);
 
-    }, 50); // Delay clearing and dealing slightly after resetting animation classes
+    }, 50); 
 }
 
 async function handleGetInterpretation() {
@@ -423,14 +362,12 @@ async function handleGetInterpretation() {
         return;
     }
 
-    // Activate the interpretation tab
     document.querySelector('.tab-button[data-tab="interpretation"]').click();
 
     interpretationText.textContent = 'Getting interpretation...';
     interpretButton.disabled = true;
 
     try {
-        // Construct the prompt for the API
         const spreadDetails = currentSpread.map((card, index) => {
             const position = spreadDefinitions[currentSpreadType]?.positions[index] || `Card ${index + 1}`;
             const reversed = card.isReversed ? ' (Reversed)' : '';
@@ -439,17 +376,15 @@ async function handleGetInterpretation() {
 
         const prompt = `Provide a tarot reading interpretation for the following ${spreadDefinitions[currentSpreadType].name} spread:\n\n${spreadDetails}\n\nPlease provide a concise, insightful interpretation focusing on the interplay between the cards in their positions.`;
 
-        // Prepare the request body for our serverless function
         const requestBody = {
-            model: "claude-3-7-sonnet-20250219", // Use a powerful model
-            max_tokens: 2048,
+            model: "claude-sonnet-4-20250514",
+            max_tokens: 4096,
             messages: [
                 { role: "user", content: prompt }
             ]
         };
 
-        // Call our serverless function endpoint
-        const response = await fetch('/api/interpret', { // CORRECTED PATH
+        const response = await fetch('/api/interpret', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -460,12 +395,9 @@ async function handleGetInterpretation() {
         const data = await response.json();
 
         if (!response.ok) {
-            // Handle errors returned from our serverless function
             console.error('Error from serverless function:', data);
             throw new Error(data.error || `Server responded with status ${response.status}`);
         }
-
-        // Extract the interpretation text from the correct place in the Anthropic response structure
         if (data.content && data.content.length > 0 && data.content[0].text) {
             interpretationText.textContent = data.content[0].text;
         } else {
@@ -475,14 +407,12 @@ async function handleGetInterpretation() {
 
     } catch (error) {
         console.error('Error getting interpretation:', error);
-        // Display a user-friendly message, including the error if possible
         interpretationText.textContent = `Error getting interpretation: ${error.message}`;
     } finally {
         interpretButton.disabled = false;
     }
 }
 
-// --- Statistics Handling ---
 function loadStats() {
     const storedStats = localStorage.getItem('tarotStats');
     if (storedStats) {
@@ -491,10 +421,10 @@ function loadStats() {
             console.log('Loaded stats from localStorage:', stats);
         } catch (e) {
             console.error('Error parsing stats from localStorage:', e);
-            stats = {}; // Reset if invalid
+            stats = {};
         }
     } else {
-        stats = {}; // Initialize if nothing stored
+        stats = {};
     }
 }
 
@@ -505,7 +435,7 @@ function updateStats(spreadType, spread) {
 
     spread.forEach(card => {
         const position = card.position;
-        const cardId = card.id; // Use card ID for tracking
+        const cardId = card.id; 
 
         if (!stats[spreadType][position]) {
             stats[spreadType][position] = {};
@@ -535,14 +465,12 @@ function displayStats() {
             statsHtml += `<h3>${spreadName}</h3><ul>`;
             for (const position in stats[spreadType]) {
                 statsHtml += `<li><strong>${position}:</strong><ul>`;
-                // Sort cards by frequency for this position
                 const sortedCards = Object.entries(stats[spreadType][position])
                                           .sort(([, countA], [, countB]) => countB - countA);
 
                 sortedCards.forEach(([cardId, count]) => {
-                    // Find card name from deck using id
                     const cardInfo = deck.find(c => c.id === cardId);
-                    const cardName = cardInfo ? cardInfo.name : cardId; // Fallback to ID if not found
+                    const cardName = cardInfo ? cardInfo.name : cardId;
                     statsHtml += `<li><img src="${cardInfo.image_url}" alt="${cardName}" class="stat-card"/> ${cardName}: ${count}</li>`;
                 });
                 statsHtml += `</ul></li>`;
