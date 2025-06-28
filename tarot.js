@@ -392,12 +392,16 @@ async function handleGetInterpretation() {
             body: JSON.stringify(requestBody)
         });
 
+        // Check if the response was successful before trying to parse JSON
+        if (!response.ok) {
+            // Try to get a more specific error message from the response body
+            const errorText = await response.text();
+            console.error('Error from serverless function:', errorText);
+            throw new Error(errorText || `Server responded with status ${response.status}`);
+        }
+
         const data = await response.json();
 
-        if (!response.ok) {
-            console.error('Error from serverless function:', data);
-            throw new Error(data.error || `Server responded with status ${response.status}`);
-        }
         if (data.content && data.content.length > 0 && data.content[0].text) {
             interpretationText.textContent = data.content[0].text;
         } else {
@@ -407,7 +411,7 @@ async function handleGetInterpretation() {
 
     } catch (error) {
         console.error('Error getting interpretation:', error);
-        interpretationText.textContent = `Error getting interpretation: ${error.message}`;
+        interpretationText.textContent = `An error occurred while fetching the interpretation. Please check the console for details or try again.`;
     } finally {
         interpretButton.disabled = false;
     }
