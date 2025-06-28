@@ -312,7 +312,7 @@ function handleDealSpread() {
 
     const existingCards = spreadArea.querySelectorAll('.card');
     existingCards.forEach(cardEl => {
-        cardEl.classList.remove('is-dealing', 'is-flipping');
+        cardEl.classList.remove('is-dealing', 'is-flipping', 'reversed');
         cardEl.style.removeProperty('--deal-delay');
         cardEl.style.removeProperty('--flip-delay');
     });
