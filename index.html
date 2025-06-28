@@ -12,46 +12,45 @@
 <body>
     <div class="container">
         <h1>tarotmancer</h1>
-        <div class="main-content">
-            <div class="left-panel">
-                <div id="controls" class="controls-area">
-                    <div class="spread-selector">
-                        <span>Select Spread:</span>
-                        <div class="spread-buttons">
-                            <button class="spread-button active" data-spread="threeCard">3 Card Spread</button>
-                            <button class="spread-button" data-spread="celticCross">Celtic Cross</button>
-                            <button class="spread-button" data-spread="horseshoe">Horseshoe</button>
-                        </div>
-                    </div>
-                    <button id="dealButton" disabled>Deal Spread</button>
-                    <button id="interpretButton" disabled>Get Interpretation</button>
-                </div>
-                <div id="spreadAreaWrapper" class="spread-area-wrapper">
-                    <h2>Spread</h2>
-                    <div id="spreadArea" class="spread-area">
-                        <!-- Cards and position labels will be dynamically added here -->
-                    </div>
+
+        <div id="controls" class="controls-area">
+            <div class="spread-selector">
+                <span>Select Spread:</span>
+                <div class="spread-buttons">
+                    <button class="spread-button active" data-spread="threeCard">3 Card Spread</button>
+                    <button class="spread-button" data-spread="celticCross">Celtic Cross</button>
+                    <button class="spread-button" data-spread="horseshoe">Horseshoe</button>
                 </div>
             </div>
-            <div class="right-panel">
-                <div id="stats-controls" class="controls-area">
-                    <div class="tab-header">
-                        <button class="tab-button active" data-tab="interpretation">Reading</button>
-                        <button class="tab-button" data-tab="stats">Statistics</button>
-                    </div>
+            <div class="action-buttons">
+                <button id="dealButton" disabled>Deal Spread</button>
+                <button id="interpretButton" disabled>Get Interpretation</button>
+            </div>
+        </div>
+
+        <div id="spreadAreaWrapper" class="spread-area-wrapper">
+            <h2>Spread</h2>
+            <div id="spreadArea" class="spread-area">
+                <!-- Cards will be dynamically added here -->
+            </div>
+        </div>
+
+        <div class="output-area">
+            <div id="stats-controls" class="tab-header">
+                <button class="tab-button active" data-tab="interpretation">Reading</button>
+                <button class="tab-button" data-tab="stats">Statistics</button>
+            </div>
+            <div class="tab-content">
+                <div id="interpretationArea" class="interpretation-area">
+                    <div id="interpretationText">Select a spread and click "Deal Spread".<span class="placeholder-text">Your reading will appear here...</span></div>
                 </div>
-                <div class="tab-content">
-                    <div id="interpretationArea" class="interpretation-area">
-                        <h2>Reading</h2>
-                        <div id="interpretationText">Select a spread and click "Deal Spread".<span class="placeholder-text">Your reading will appear here...</span></div>
-                    </div>
-                    <div id="statsArea" class="stats-area hidden">
-                        <h2>Card Statistics</h2>
-                        <div id="statsText">Statistics will appear here after draws.<span class="placeholder-text">Draw statistics will appear here...</span></div>
-                    </div>
+                <div id="statsArea" class="stats-area hidden">
+                    <h2>Card Statistics</h2>
+                    <div id="statsText">Statistics will appear here after draws.<span class="placeholder-text">Draw statistics will appear here...</span></div>
                 </div>
             </div>
         </div>
+
     </div>
 
     <script src="tarot.js"></script>
