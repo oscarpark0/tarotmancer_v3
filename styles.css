@@ -396,33 +396,40 @@ button:disabled {
         width: 100%;
     }
 
-    /* Increase card size for complex spreads on mobile */
-    .spread-area.celtic-cross-layout .card-container, 
-    .spread-area.horseshoe-layout .card-container {
-        width: 28%; /* Larger cards on mobile */
+    /* Make spread area taller on mobile */
+    .spread-area.celtic-cross-layout,
+    .spread-area.horseshoe-layout {
+        aspect-ratio: 3 / 4;
+        min-height: 60vh;
     }
 
-    /* --- Mobile Celtic Cross: More vertical layout --- */
-    .spread-area.celtic-cross-layout .card-container:nth-child(1) { top: 25%; left: 36%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(2) { top: 25%; left: 36%; transform: rotate(90deg); }
-    .spread-area.celtic-cross-layout .card-container:nth-child(3) { top: 50%; left: 36%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(4) { top: 25%; left: 5%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(5) { top: 0%;  left: 36%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(6) { top: 25%; left: 67%; }
-    /* Staff below the cross */
-    .spread-area.celtic-cross-layout .card-container:nth-child(7) { top: 75%; left: 5%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(8) { top: 75%; left: 36%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(9) { top: 75%; left: 67%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(10){ top: 50%; left: 5%; }
+    /* Adjust card size for complex spreads on mobile */
+    .spread-area.celtic-cross-layout .card-container, 
+    .spread-area.horseshoe-layout .card-container {
+        width: 24%; /* Slightly smaller to fit better */
+    }
 
-    /* --- Mobile Horseshoe: Tighter, taller arc --- */
-    .spread-area.horseshoe-layout .card-container:nth-child(1) { top: 40%; left: 5%;  transform: rotate(-35deg); }
-    .spread-area.horseshoe-layout .card-container:nth-child(2) { top: 15%; left: 20%; transform: rotate(-20deg); }
-    .spread-area.horseshoe-layout .card-container:nth-child(3) { top: 5%;  left: 45%; }
-    .spread-area.horseshoe-layout .card-container:nth-child(4) { top: 15%; left: 70%; transform: rotate(20deg); }
-    .spread-area.horseshoe-layout .card-container:nth-child(5) { top: 40%; left: 85%; transform: rotate(35deg); }
-    .spread-area.horseshoe-layout .card-container:nth-child(6) { top: 70%; left: 65%; }
-    .spread-area.horseshoe-layout .card-container:nth-child(7) { top: 70%; left: 25%; }
+    /* --- Mobile Celtic Cross: Recalculated vertical layout --- */
+    .spread-area.celtic-cross-layout .card-container:nth-child(1) { top: 25%; left: 38%; z-index: 1; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(2) { top: 25%; left: 38%; transform: rotate(90deg); z-index: 2; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(3) { top: 45%; left: 38%; } /* Below */
+    .spread-area.celtic-cross-layout .card-container:nth-child(4) { top: 25%; left: 8%; }  /* Left */
+    .spread-area.celtic-cross-layout .card-container:nth-child(5) { top: 5%;  left: 38%; }  /* Above */
+    .spread-area.celtic-cross-layout .card-container:nth-child(6) { top: 25%; left: 68%; } /* Right */
+    /* Staff as a 2x2 grid below */
+    .spread-area.celtic-cross-layout .card-container:nth-child(7) { top: 68%; left: 15%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(8) { top: 68%; left: 45%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(9) { top: 85%; left: 15%; }
+    .spread-area.celtic-cross-layout .card-container:nth-child(10){ top: 85%; left: 45%; }
+
+    /* --- Mobile Horseshoe: Recalculated tighter, taller arc --- */
+    .spread-area.horseshoe-layout .card-container:nth-child(1) { top: 55%; left: 2%;  transform: rotate(-45deg); }
+    .spread-area.horseshoe-layout .card-container:nth-child(2) { top: 25%; left: 10%; transform: rotate(-25deg); }
+    .spread-area.horseshoe-layout .card-container:nth-child(3) { top: 5%;  left: 38%; }
+    .spread-area.horseshoe-layout .card-container:nth-child(4) { top: 25%; left: 66%; transform: rotate(25deg); }
+    .spread-area.horseshoe-layout .card-container:nth-child(5) { top: 55%; left: 74%; transform: rotate(45deg); }
+    .spread-area.horseshoe-layout .card-container:nth-child(6) { top: 75%; left: 55%; }
+    .spread-area.horseshoe-layout .card-container:nth-child(7) { top: 75%; left: 21%; }
 
     .stats-row {
         grid-template-columns: 1fr;
