@@ -461,25 +461,46 @@ function saveStats() {
 }
 
 function displayStats() {
-    let statsHtml = 'No stats recorded yet.';
+    let statsHtml = '<div class="stats-placeholder">No stats recorded yet.</div>';
     if (Object.keys(stats).length > 0) {
         statsHtml = '';
         for (const spreadType in stats) {
             const spreadName = spreadDefinitions[spreadType]?.name || spreadType;
-            statsHtml += `<h3>${spreadName}</h3><ul>`;
+            statsHtml += `<div class="stats-spread-section">`;
+            statsHtml += `<h3>${spreadName}</h3>`;
+
             for (const position in stats[spreadType]) {
-                statsHtml += `<li><strong>${position}:</strong><ul>`;
-                const sortedCards = Object.entries(stats[spreadType][position])
+                statsHtml += `<div class="stats-position-section">`;
+                statsHtml += `<h4>${position}</h4>`;
+                
+                const positionStats = stats[spreadType][position];
+                const totalDrawsForPosition = Object.values(positionStats).reduce((sum, count) => sum + count, 0);
+
+                const sortedCards = Object.entries(positionStats)
                                           .sort(([, countA], [, countB]) => countB - countA);
 
                 sortedCards.forEach(([cardId, count]) => {
                     const cardInfo = deck.find(c => c.id === cardId);
-                    const cardName = cardInfo ? cardInfo.name : cardId;
-                    statsHtml += `<li><img src="${cardInfo.image_url}" alt="${cardName}" class="stats-card-img"/> ${cardName}: ${count}</li>`;
+                    if (!cardInfo) return;
+
+                    const percentage = totalDrawsForPosition > 0 ? ((count / totalDrawsForPosition) * 100).toFixed(1) : 0;
+                    const cardName = cardInfo.name;
+
+                    statsHtml += `
+                        <div class="stats-row">
+                            <div class="stats-card-info">
+                                <img src="${cardInfo.image_url}" alt="${cardName}" class="stats-card-img"/>
+                                <span class="stats-card-name">${cardName}</span>
+                            </div>
+                            <div class="stats-bar-container">
+                                <div class="stats-bar" style="width: ${percentage}%;"></div>
+                            </div>
+                            <span class="stats-count">${count} (${percentage}%)</span>
+                        </div>`;
                 });
-                statsHtml += `</ul></li>`;
+                statsHtml += `</div>`; // .stats-position-section
             }
-            statsHtml += `</ul>`;
+            statsHtml += `</div>`; // .stats-spread-section
         }
     }
     statsText.innerHTML = statsHtml;
