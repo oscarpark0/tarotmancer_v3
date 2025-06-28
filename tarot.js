@@ -374,7 +374,7 @@ async function handleGetInterpretation() {
             return `${position}: ${card.name}${reversed}`;
         }).join('\n');
 
-        const prompt = `Provide a tarot reading interpretation for the following ${spreadDefinitions[currentSpreadType].name} spread:\n\n${spreadDetails}\n\nPlease provide a concise, insightful interpretation focusing on the interplay between the cards in their positions.`;
+        const prompt = `Provide a tarot reading interpretation for the following ${spreadDefinitions[currentSpreadType].name} spread:\n\n${spreadDetails}\n\nPlease provide a thorough, insightful interpretation focusing on the interplay between the cards in their positions and the overall meaning of the spread.`;
 
         const requestBody = {
             model: "claude-sonnet-4-20250514",
@@ -392,9 +392,7 @@ async function handleGetInterpretation() {
             body: JSON.stringify(requestBody)
         });
 
-        // Check if the response was successful before trying to parse JSON
         if (!response.ok) {
-            // Try to get a more specific error message from the response body
             const errorText = await response.text();
             console.error('Error from serverless function:', errorText);
             throw new Error(errorText || `Server responded with status ${response.status}`);
@@ -498,9 +496,9 @@ function displayStats() {
                             <span class="stats-count">${count} (${percentage}%)</span>
                         </div>`;
                 });
-                statsHtml += `</div>`; // .stats-position-section
+                statsHtml += `</div>`; 
             }
-            statsHtml += `</div>`; // .stats-spread-section
+            statsHtml += `</div>`; 
         }
     }
     statsText.innerHTML = statsHtml;
