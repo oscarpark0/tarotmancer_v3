@@ -8,7 +8,7 @@ body {
     background-image: linear-gradient(rgba(0, 255, 0, 0.05) 1px, transparent 1px);
     background-size: 100% 3px;
     text-shadow: 0 0 3px rgba(0, 255, 0, 0.4);
-    overflow-x: hidden; /* Prevent horizontal scroll */
+    overflow-x: hidden; /* Prevent horizontal scroll on body */
 }
 
 .container {
@@ -36,7 +36,7 @@ h1 {
 }
 
 /* === LAYOUT AREAS === */
-.controls-area, .spread-area-wrapper, .output-area {
+.controls-area, .output-area {
     border: 1px solid #00FF00;
     padding: 15px;
     width: 100%;
@@ -78,7 +78,6 @@ h1 {
     box-shadow: 0 0 5px #00FF00;
     border-top: none; /* Remove top border as header has bottom border */
     min-height: 200px; /* Ensure a minimum height */
-    max-height: 40vh; /* Set a max height */
     overflow-y: auto; /* Allow scrolling for content */
 }
 
@@ -139,107 +138,145 @@ button:disabled {
     justify-content: center;
     align-items: center;
     gap: 20px;
-    padding: 15px 0;
-    min-height: 40vh;
+    padding: 20px;
+    min-height: 250px;
     perspective: 1200px;
     position: relative;
+    box-sizing: border-box;
 }
 
 .card-container {
     position: relative; /* Default for flexbox layout */
-    width: 120px; /* Base width for cards */
-    height: 200px; /* Base height for cards */
-    transition: transform 0.6s;
-    transform-style: preserve-3d;
+    width: 120px;
+    height: 200px;
+    flex-shrink: 0; /* Prevent cards from shrinking in flex layout */
 }
 
-/* === RESPONSIVE SPREAD LAYOUTS === */
-
+/* === RESPONSIVE SPREAD LAYOUTS (PRESERVED) === */
 .spread-area.celtic-cross-layout, .spread-area.horseshoe-layout {
     display: block; /* Override flex for absolute positioning */
-    aspect-ratio: 4 / 3; /* Maintain a consistent shape */
-    max-height: 75vh;
+    position: relative;
     margin: 0 auto;
-    min-height: auto; /* Override default min-height */
+    transform-origin: top left;
+}
+
+.spread-area.celtic-cross-layout {
+    width: 700px;
+    height: 750px;
+}
+
+.spread-area.horseshoe-layout {
+    width: 700px;
+    height: 600px;
 }
 
 .spread-area.celtic-cross-layout .card-container, 
 .spread-area.horseshoe-layout .card-container {
     position: absolute;
-    /* Card size relative to the container */
-    width: 14%; /* Reduced from 16% */
-    height: auto;
-    aspect-ratio: 120 / 200; /* Maintain card proportions */
+    width: 120px; /* Fixed width */
+    height: 200px; /* Fixed height */
 }
 
-/* --- Celtic Cross Responsive Positions --- */
-.spread-area.celtic-cross-layout .card-container:nth-child(1) { top: 35%; left: 25%; z-index: 1; }
-.spread-area.celtic-cross-layout .card-container:nth-child(2) { top: 35%; left: 25%; transform: rotate(90deg); z-index: 2; }
-.spread-area.celtic-cross-layout .card-container:nth-child(3) { top: 65%; left: 25%; }
-.spread-area.celtic-cross-layout .card-container:nth-child(4) { top: 35%; left: 5%; }
-.spread-area.celtic-cross-layout .card-container:nth-child(5) { top: 5%;  left: 25%; }
-.spread-area.celtic-cross-layout .card-container:nth-child(6) { top: 35%; left: 45%; }
-.spread-area.celtic-cross-layout .card-container:nth-child(7) { top: 75%; left: 75%; }
-.spread-area.celtic-cross-layout .card-container:nth-child(8) { top: 50%; left: 75%; }
-.spread-area.celtic-cross-layout .card-container:nth-child(9) { top: 25%; left: 75%; }
-.spread-area.celtic-cross-layout .card-container:nth-child(10){ top: 0%;  left: 75%; }
+/* --- Celtic Cross Positions --- */
+.spread-area.celtic-cross-layout .card-container:nth-child(1) { top: 275px; left: 210px; z-index: 1; }
+.spread-area.celtic-cross-layout .card-container:nth-child(2) { top: 275px; left: 210px; transform: rotate(90deg); z-index: 2; }
+.spread-area.celtic-cross-layout .card-container:nth-child(3) { top: 500px; left: 210px; }
+.spread-area.celtic-cross-layout .card-container:nth-child(4) { top: 275px; left: 50px; }
+.spread-area.celtic-cross-layout .card-container:nth-child(5) { top: 50px;  left: 210px; }
+.spread-area.celtic-cross-layout .card-container:nth-child(6) { top: 275px; left: 370px; }
+.spread-area.celtic-cross-layout .card-container:nth-child(7) { top: 550px; left: 530px; }
+.spread-area.celtic-cross-layout .card-container:nth-child(8) { top: 383px; left: 530px; }
+.spread-area.celtic-cross-layout .card-container:nth-child(9) { top: 216px; left: 530px; }
+.spread-area.celtic-cross-layout .card-container:nth-child(10){ top: 50px;  left: 530px; }
 
-/* --- Horseshoe Responsive Positions --- */
-.spread-area.horseshoe-layout .card-container:nth-child(1) { top: 50%; left: 5%;  transform: rotate(-25deg); }
-.spread-area.horseshoe-layout .card-container:nth-child(2) { top: 20%; left: 18%; transform: rotate(-15deg); }
-.spread-area.horseshoe-layout .card-container:nth-child(3) { top: 5%;  left: 42%; }
-.spread-area.horseshoe-layout .card-container:nth-child(4) { top: 20%; left: 66%; transform: rotate(15deg); }
-.spread-area.horseshoe-layout .card-container:nth-child(5) { top: 50%; left: 79%; transform: rotate(25deg); }
-.spread-area.horseshoe-layout .card-container:nth-child(6) { top: 80%; left: 60%; }
-.spread-area.horseshoe-layout .card-container:nth-child(7) { top: 80%; left: 24%; }
+/* --- Horseshoe Positions --- */
+.spread-area.horseshoe-layout .card-container:nth-child(1) { top: 250px; left: 30px;  transform: rotate(-25deg); }
+.spread-area.horseshoe-layout .card-container:nth-child(2) { top: 80px;  left: 120px; transform: rotate(-15deg); }
+.spread-area.horseshoe-layout .card-container:nth-child(3) { top: 20px;  left: 290px; }
+.spread-area.horseshoe-layout .card-container:nth-child(4) { top: 80px;  left: 460px; transform: rotate(15deg); }
+.spread-area.horseshoe-layout .card-container:nth-child(5) { top: 250px; left: 550px; transform: rotate(25deg); }
+.spread-area.horseshoe-layout .card-container:nth-child(6) { top: 400px; left: 420px; }
+.spread-area.horseshoe-layout .card-container:nth-child(7) { top: 400px; left: 160px; }
 
-/* === POSITION LABELS === */
+/* === POSITION LABELS (PRESERVED) === */
 .position-label {
     position: absolute;
-    font-size: 11px;
+    font-size: 12px;
     color: #00cc00;
     text-align: center;
-    width: 80px;
+    width: 120px;
     pointer-events: none;
-    z-index: 3; /* Ensure label is on top */
+    z-index: 5;
     background: rgba(0,0,0,0.7);
     padding: 3px 5px;
     border-radius: 3px;
     line-height: 1.2;
-    white-space: pre-line;
-    /* Positioned relative to card */
-    bottom: -25px;
-    left: 50%;
-    transform: translateX(-50%);
+    white-space: normal;
 }
+
+.label-below { bottom: -45px; left: 0; }
+.label-above { top: -45px; left: 0; }
+.label-right { left: 130px; top: 50%; transform: translateY(-50%); }
 
 .spread-area.celtic-cross-layout .card-container:nth-child(2) .position-label {
-    transform: translateX(-50%) rotate(-90deg);
-    bottom: auto;
-    left: -25px;
+    transform: translateY(-50%) rotate(-90deg);
+    left: -105px; /* Adjust for rotated card */
     top: 50%;
-    transform-origin: center;
+    width: 200px; /* Give more space for rotated label */
 }
 
-/* === CARD ANIMATIONS & STYLING === */
+/* === CARD ANIMATIONS & STYLING (WORKING VERSION) === */
+@keyframes dealAppear {
+    from {
+        opacity: 0;
+        transform: translateY(50px) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
 
-/* The .card div is the root of the card model and animations */
+@keyframes cardFlip {
+    from {
+        transform: rotateY(0deg);
+    }
+    to {
+        transform: rotateY(180deg);
+    }
+}
+
 .card {
     width: 100%;
     height: 100%;
-    position: relative;
+    position: absolute;
     transform-style: preserve-3d;
-    opacity: 0; /* Start hidden, will be animated in */
-    transform: scale(1); /* Initial state for animation */
+    transition: transform 0.6s;
+    opacity: 0; /* Start hidden */
+    transform: scale(1); /* Base state */
 }
 
-/* The .card-inner is the element that performs the 3D flip */
+.card.is-dealing {
+    animation: dealAppear 0.5s ease-out forwards;
+    /* animation-delay is set via JS timeout */
+}
+
 .card-inner {
     position: relative;
     width: 100%;
     height: 100%;
     transform-style: preserve-3d;
-    transition: transform 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+.card.is-flipping .card-inner {
+    /* This class triggers the flip */
+    transform: rotateY(180deg);
+}
+
+.card.reversed.is-flipping .card-inner {
+    /* Combined state for reversed cards */
+    transform: rotateY(180deg) rotateZ(180deg);
 }
 
 .card-face {
@@ -250,7 +287,13 @@ button:disabled {
     backface-visibility: hidden;
     border-radius: 8px;
     overflow: hidden;
+    border: 1px solid #005500;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+.card-back {
+    background-color: #eee; /* Placeholder, image will cover */
+    transform: rotateY(180deg); /* Back face starts rotated */
 }
 
 .card-face img {
@@ -260,45 +303,115 @@ button:disabled {
     display: block;
 }
 
-.card-back {
-    transform: rotateY(180deg);
+.card.reversed .card-back img {
+    transform: rotate(180deg);
 }
 
-/* --- ANIMATION TRIGGERS (from JS) --- */
-
-/* 1. Dealing Animation */
-@keyframes dealAppear {
-    from {
-        opacity: 0;
-        transform: translateY(40px) scale(0.8);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+.interpretation-area,
+.stats-area {
+    min-height: 100px;
 }
 
-.card.is-dealing {
-    animation: dealAppear 0.5s ease-out forwards;
-    animation-delay: var(--deal-delay, 0s);
+#interpretationText,
+#statsText {
+    white-space: pre-wrap; /* Preserve formatting from server/stats */
+    padding: 10px;
+    background-color: #000;
+    border: 1px dashed #008000; /* Dimmer green border */
+    margin-top: 10px;
+    min-height: 50px;
+    line-height: 1.4;
 }
 
-/* 2. Flipping Animation */
-.card.is-flipping .card-inner {
-    transform: rotateY(180deg);
+/* --- Main Layout --- */
+.main-content {
+    display: flex;
+    max-width: 1500px;
+    margin: 0 auto;
+    width: 100%;
+    gap: 20px;
+    align-items: flex-start;
+    box-sizing: border-box;
 }
 
-/* 3. Reversed Card Styling */
-.card.reversed .card-inner {
-    transform: rotateY(180deg) rotateZ(180deg);
+.left-panel {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.right-panel {
+    flex: 1 1 300px;
+    min-width: 300px;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.spread-area-wrapper {
+    flex: 1;
+    min-height: 350px;
+    max-width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    overflow-x: auto; /* Allow horizontal scrolling for wide layouts */
+}
+
+.interpretation-area,
+.stats-area {
+    flex: none !important; /* Override flex */
+    width: 100% !important; /* Force full width */
+    overflow-y: auto;
+    min-height: 200px;
+}
+
+.interpretation-area,
+.stats-area {
+    overflow-y: auto; /* Scroll within fixed box */
+    width: 100%;
+    box-sizing: border-box;
+    /* We will set height via JS */
+}
+
+/* Spread Buttons */
+.spread-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap; /* Allow buttons to wrap on small screens */
+}
+.spread-button {
+    background-color: #000;
+    background-image: linear-gradient(to bottom, #001100, #000);
+    border: 2px solid #00FF00;
+    color: #00FF00;
+    padding: 6px 14px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.spread-button:hover, .spread-button.active {
+    background-color: #00FF00;
+    color: #000;
+    box-shadow: 0 0 10px #00FF00;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.action-buttons button {
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
 }
 
 .hidden {
-    display: none;
-}
-
-#interpretationArea #interpretButton {
-    margin-bottom: 15px; /* Add space between button and text */
+    display: none !important;
 }
 
 .stats-card-img {
@@ -307,16 +420,6 @@ button:disabled {
     vertical-align: middle;
     margin-right: 10px;
     border-radius: 3px;
-}
-
-#interpretationText,
-#statsText {
-    padding: 10px;
-    background-color: #000;
-    border: 1px dashed #008000;
-    margin-top: 10px;
-    min-height: 50px;
-    line-height: 1.4;
 }
 
 /* === NEW STATISTICS LAYOUT === */
@@ -382,6 +485,9 @@ button:disabled {
 
 /* === RESPONSIVE DESIGN FOR MOBILE === */
 @media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
     .container {
         padding: 10px;
     }
@@ -389,6 +495,15 @@ button:disabled {
     .controls-area {
         flex-direction: column;
         align-items: stretch;
+    }
+
+    .main-content {
+        flex-direction: column;
+    }
+
+    .right-panel {
+        width: 100%;
+        max-width: 100%;
     }
 
     .spread-selector, .action-buttons {
@@ -396,121 +511,11 @@ button:disabled {
         width: 100%;
     }
 
-    .spread-area.celtic-cross-layout,
-    .spread-area.horseshoe-layout {
-        aspect-ratio: 1 / 1;
-        min-height: auto;
-        width: 90vw;
-        max-width: 450px;
-        margin: 1rem auto;
-    }
-
-    /* --- Mobile Celtic Cross: Definitive Layout --- */
-    .spread-area.celtic-cross-layout .card-container { width: 24%; }
-    /* The Cross (Correct Traditional Mapping) */
-    .spread-area.celtic-cross-layout .card-container:nth-child(1) { top: 33%; left: 25%; z-index: 1; } /* 1. Center */
-    .spread-area.celtic-cross-layout .card-container:nth-child(2) { top: 33%; left: 25%; transform: rotate(90deg); z-index: 2; } /* 2. Center, crossed */
-    .spread-area.celtic-cross-layout .card-container:nth-child(3) { top: 0%;  left: 25%; } /* 3. Above */
-    .spread-area.celtic-cross-layout .card-container:nth-child(4) { top: 66%; left: 25%; } /* 4. Below */
-    .spread-area.celtic-cross-layout .card-container:nth-child(5) { top: 33%; left: 0%; }  /* 5. Left */
-    .spread-area.celtic-cross-layout .card-container:nth-child(6) { top: 33%; left: 50%; } /* 6. Right */
-    /* The Staff (Vertically Aligned & Spaced) */
-    .spread-area.celtic-cross-layout .card-container:nth-child(7) { top: 75%; left: 76%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(8) { top: 50%; left: 76%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(9) { top: 25%; left: 76%; }
-    .spread-area.celtic-cross-layout .card-container:nth-child(10){ top: 0%;  left: 76%; }
-
-    /* --- Mobile Horseshoe: Definitive Symmetrical Layout --- */
-    .spread-area.horseshoe-layout .card-container { width: 24%; }
-    .spread-area.horseshoe-layout .card-container:nth-child(1) { top: 45%; left: 0%;  transform: rotate(-50deg); }
-    .spread-area.horseshoe-layout .card-container:nth-child(2) { top: 20%; left: 15%; transform: rotate(-25deg); }
-    .spread-area.horseshoe-layout .card-container:nth-child(3) { top: 0%;  left: 38%; }
-    .spread-area.horseshoe-layout .card-container:nth-child(4) { top: 20%; left: 61%; transform: rotate(25deg); }
-    .spread-area.horseshoe-layout .card-container:nth-child(5) { top: 45%; left: 76%; transform: rotate(50deg); }
-    /* Symmetrical Bottom Cards */
-    .spread-area.horseshoe-layout .card-container:nth-child(6) { top: 65%; left: 51%; }
-    .spread-area.horseshoe-layout .card-container:nth-child(7) { top: 65%; left: 25%; }
-
-    .stats-row {
-        grid-template-columns: 1fr;
-        text-align: center;
-    }
-    .stats-card-info {
-        justify-content: center;
-    }
-    .stats-count {
-        text-align: center;
-    }
-}
-
-/* === CRT/SCANLINE EFFECTS === */
-body::after {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    pointer-events: none;
-    background: 
-        linear-gradient(rgba(0, 255, 0, 0.05) 1px, transparent 1px);
-    background-size: 100% 3px;
-    z-index: 1000;
-    animation: flicker 0.15s infinite;
-}
-
-@keyframes flicker {
-  0%   { opacity: 0.8; }
-  50%  { opacity: 1; }
-  100% { opacity: 0.8; }
-}
-
-/* === RESPONSIVE DESIGN === */
-@media (max-width: 768px) {
-    body {
-        padding: 10px;
-    }
-
-    .container {
-        padding: 10px;
-    }
-
-    .controls-area {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 15px;
-    }
-
-    .spread-selector, .action-buttons {
+    .spread-buttons {
         justify-content: center;
     }
 
-    .card-container {
-        width: 90px;
-        height: 150px;
-    }
-
-    .spread-area.celtic-cross-layout, .spread-area.horseshoe-layout {
-        max-height: 60vh;
-    }
-}
-
-@media (max-width: 480px) {
-    h1 {
-        font-size: 1.5em;
-    }
-
-    .card-container {
-        width: 75px;
-        height: 125px;
-    }
-
-    .position-label {
-        font-size: 9px;
-        bottom: -20px;
-    }
-
-    .spread-area.celtic-cross-layout .card-container:nth-child(2) .position-label {
-        left: -20px;
+    .spread-area-wrapper {
+        min-height: 50vh; /* Taller on mobile */
     }
 }
