@@ -53,11 +53,37 @@ h1 {
     gap: 20px;
 }
 
-.spread-selector, .action-buttons, .tab-header {
+.spread-selector, .tab-header {
     display: flex;
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
+}
+
+.action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* Special styling for primary action buttons */
+#dealButton, #interpretButton {
+    background-color: rgba(0, 20, 0, 0.8);
+    border: 2px solid #00FF00;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+#dealButton:hover, #interpretButton:hover {
+    background-color: rgba(0, 255, 0, 0.15);
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
+}
+
+#dealButton:active, #interpretButton:active {
+    transform: translateY(1px);
 }
 
 .output-area {
@@ -90,21 +116,22 @@ h1 {
 
 /* === BUTTONS === */
 button {
-    background-color: transparent;
+    background-color: rgba(0, 0, 0, 0.8);
     border: 1px solid #00FF00;
     color: #00FF00;
-    padding: 8px 15px;
+    padding: 10px 16px;
     font-family: 'Courier New', Courier, monospace;
     cursor: pointer;
-    transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+    transition: all 0.2s ease;
     text-transform: uppercase;
     letter-spacing: 1px;
+    border-radius: 4px;
+    font-weight: 500;
 }
 
 button:hover, button:focus {
-    background-color: #00FF00;
-    color: #000;
-    box-shadow: 0 0 10px #00FF00;
+    background-color: rgba(0, 255, 0, 0.1);
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
     outline: none;
 }
 
@@ -122,13 +149,14 @@ button:disabled {
     opacity: 0.4;
     cursor: not-allowed;
     background-color: transparent;
-    color: #00FF00;
+    color: #006600;
     box-shadow: none;
 }
 
 .tab-header button {
     border-bottom: none;
-    border-radius: 5px 5px 0 0;
+    border-radius: 4px 4px 0 0;
+    padding: 8px 16px;
 }
 
 /* === SPREAD AREA & CARDS === */
@@ -379,24 +407,31 @@ button:disabled {
 /* Spread Buttons */
 .spread-buttons {
     display: flex;
-    gap: 10px;
+    gap: 12px;
     flex-wrap: wrap; /* Allow buttons to wrap on small screens */
 }
+
 .spread-button {
-    background-color: #000;
-    background-image: linear-gradient(to bottom, #001100, #000);
-    border: 2px solid #00FF00;
+    background-color: rgba(0, 20, 0, 0.6);
+    border: 1px solid #00FF00;
     color: #00FF00;
-    padding: 6px 14px;
-    font-size: 14px;
+    padding: 8px 14px;
+    font-size: 13px;
     cursor: pointer;
     transition: all 0.2s ease;
+    border-radius: 4px;
+    font-weight: 500;
 }
 
-.spread-button:hover, .spread-button.active {
+.spread-button:hover {
+    background-color: rgba(0, 255, 0, 0.1);
+    box-shadow: 0 0 6px rgba(0, 255, 0, 0.3);
+}
+
+.spread-button.active {
     background-color: #00FF00;
     color: #000;
-    box-shadow: 0 0 10px #00FF00;
+    font-weight: bold;
 }
 
 .action-buttons {
