@@ -127,6 +127,30 @@ function setupEventListeners() {
             document.getElementById('statsArea').classList.toggle('hidden', tab !== 'stats');
         });
     });
+
+    // Card focus on click (event delegation on spreadArea)
+    if (spreadArea) {
+        spreadArea.addEventListener('click', (e) => {
+            const clickedCardContainer = e.target.closest('.card-container');
+
+            // If a card container was clicked
+            if (clickedCardContainer) {
+                const isAlreadyFocused = clickedCardContainer.classList.contains('focused');
+                
+                // Remove focus from all cards first
+                spreadArea.querySelectorAll('.card-container.focused').forEach(card => {
+                    card.classList.remove('focused');
+                });
+
+                // If it wasn't already focused, add focus class to the clicked card
+                if (!isAlreadyFocused) {
+                    clickedCardContainer.classList.add('focused');
+                }
+            }
+        });
+    } else {
+        console.error('spreadArea not found for click listener');
+    }
 }
 
 // --- Core Logic ---
