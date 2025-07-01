@@ -216,10 +216,10 @@ button:disabled {
 /* --- Celtic Cross Positions --- */
 .spread-area.celtic-cross-layout .card-container:nth-child(1) { top: 275px; left: 210px; z-index: 1; }
 .spread-area.celtic-cross-layout .card-container:nth-child(2) { top: 275px; left: 210px; transform: rotate(90deg); z-index: 2; }
-.spread-area.celtic-cross-layout .card-container:nth-child(3) { top: 500px; left: 210px; }
-.spread-area.celtic-cross-layout .card-container:nth-child(4) { top: 275px; left: 50px; }
-.spread-area.celtic-cross-layout .card-container:nth-child(5) { top: 50px;  left: 210px; }
-.spread-area.celtic-cross-layout .card-container:nth-child(6) { top: 275px; left: 370px; }
+.spread-area.celtic-cross-layout .card-container:nth-child(3) { top: 510px; left: 210px; } /* Moved down for space */
+.spread-area.celtic-cross-layout .card-container:nth-child(4) { top: 275px; left: 40px; }  /* Moved left for space */
+.spread-area.celtic-cross-layout .card-container:nth-child(5) { top: 40px;  left: 210px; } /* Moved up for space */
+.spread-area.celtic-cross-layout .card-container:nth-child(6) { top: 275px; left: 380px; } /* Moved right for space */
 .spread-area.celtic-cross-layout .card-container:nth-child(7) { top: 550px; left: 530px; }
 .spread-area.celtic-cross-layout .card-container:nth-child(8) { top: 383px; left: 530px; }
 .spread-area.celtic-cross-layout .card-container:nth-child(9) { top: 216px; left: 530px; }
@@ -266,6 +266,14 @@ button:disabled {
 /* Position adjustments */
 .label-below { bottom: -55px; }
 .label-above { top: -55px; }
+
+.label-left {
+    right: 135px; /* Position to the left of the card */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 150px;
+}
+
 .label-right {
     left: 135px;
     top: 50%;
@@ -273,11 +281,13 @@ button:disabled {
     width: 150px;
 }
 
-.spread-area.celtic-cross-layout .card-container:nth-child(2) .position-label {
-    transform: translateY(-50%) rotate(-90deg);
-    left: -115px; /* Adjust for rotated card */
+/* Special label for the crossing card in Celtic Cross */
+.label-cross {
     top: 50%;
-    width: 200px; /* Give more space for rotated label */
+    left: -110px; /* Position it to the left of the vertical card */
+    width: 200px;
+    transform: translateY(-50%) rotate(-90deg);
+    transform-origin: center;
 }
 
 /* === CARD ANIMATIONS & STYLING (WORKING VERSION) === */

@@ -210,12 +210,21 @@ function displaySpread(spread) {
 
         // Add specific position classes for different layouts
         if (currentSpreadType === 'celticCross') {
-            if (index <= 2 || index === 3 || index === 5) {
-                positionLabel.classList.add('label-below');
-            } else if (index === 4) {
-                positionLabel.classList.add('label-above');
-            } else if (index >= 6) {
-                positionLabel.classList.add('label-right');
+            const positions = {
+                0: 'label-below',   // 1. Present Situation
+                1: 'label-cross',   // 2. Immediate Challenge (special)
+                2: 'label-below',   // 3. Distant Past
+                3: 'label-left',    // 4. Recent Past
+                4: 'label-above',   // 5. Best Outcome
+                5: 'label-right',   // 6. Near Future
+                6: 'label-right',   // 7. Your Attitude
+                7: 'label-right',   // 8. External Influences
+                8: 'label-right',   // 9. Hopes and Fears
+                9: 'label-right'    // 10. Final Outcome
+            };
+            const positionClass = positions[index];
+            if (positionClass) {
+                positionLabel.classList.add(positionClass);
             }
         } else if (currentSpreadType === 'horseshoe') {
             if (index === 2 || index === 5 || index === 6) {
