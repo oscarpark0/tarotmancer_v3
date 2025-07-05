@@ -78,6 +78,9 @@ async function loadDeck() {
             };
             if (newCard.arcana === 'major') {
                 newCard.suit = 'Major Arcana';
+            } else if (newCard.arcana === 'minor' && newCard.name) {
+                const nameParts = newCard.name.split(' ');
+                newCard.rank = nameParts[0];
             }
             return newCard;
         });
@@ -444,8 +447,8 @@ function updateStats(spreadType, spread) {
         const suit = card.suit || 'Major Arcana';
         spreadStats.suits[suit] = (spreadStats.suits[suit] || 0) + 1;
 
-        if (card.arcana === 'minor') {
-            spreadStats.numbers[card.number] = (spreadStats.numbers[card.number] || 0) + 1;
+        if (card.arcana === 'minor' && card.rank) {
+            spreadStats.numbers[card.rank] = (spreadStats.numbers[card.rank] || 0) + 1;
         }
         if (card.isReversed) {
             spreadStats.reversals = (spreadStats.reversals || 0) + 1;
