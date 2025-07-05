@@ -345,7 +345,7 @@ async function handleGetInterpretation() {
         return `${position}: ${card.name}${reversed}`;
     }).join('\n');
 
-    const prompt = `Provide a thorough and insightful tarot reading interpretation for the following ${spreadDefinitions[currentSpreadType].name} spread:\n\n${spreadDetails}\n\nPlease provide a thorough and insightful interpretation focusing on the interplay between the cards in their positions and the overall meaning of the spread. Format your response neatly to allow the reader to easily understand the meaning of the spread.`;
+    const prompt = `Please provide a thorough and insightful tarot reading interpretation for the following ${spreadDefinitions[currentSpreadType].name} spread:\n\n${spreadDetails}\n\n-Format your response neatly to allow the reader to easily understand the meaning of the spread.\n-Include a summary of the spread, a description of the overall meaning of the spread, and a description of the meaning of each card in the spread. Begin your response with "Dear Seeker".`;
 
     try {
         const response = await fetch('/api/interpret', {
