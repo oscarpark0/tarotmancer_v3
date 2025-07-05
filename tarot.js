@@ -10,6 +10,7 @@ const statsArea = document.getElementById('statsArea');
 let deck = [];
 let currentSpread = [];
 let currentSpreadType = 'threeCard'; // Default spread
+let stats = {}; // For tracking card stats
 
 
 // --- Constants ---
@@ -61,7 +62,8 @@ const spreadDefinitions = {
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('DOM fully loaded and parsed');
     await loadDeck();
-    displayStats(); // Initial call to clear stats area if needed
+    loadStats();
+    displayStats(currentSpreadType);
     setupEventListeners();
     setupResizeObserver();
 });
@@ -99,6 +101,7 @@ function setupEventListeners() {
             spreadButtons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentSpreadType = btn.dataset.spread;
+            displayStats(currentSpreadType);
         });
     });
 
@@ -331,7 +334,9 @@ function handleDealSpread() {
         }));
 
         displaySpread(currentSpread);
-        displayStats(); // Update stats for the new spread
+        updateStats(currentSpreadType, currentSpread);
+        saveStats();
+        displayStats(currentSpreadType);
 
         // Enable interpretation button after a delay (e.g., after flip animation might finish)
         // Adjust timing based on animation duration using global constants
@@ -417,56 +422,111 @@ async function handleGetInterpretation() {
     }
 }
 
-function displayStats() {
-    if (!statsText) return;
+// --- Statistics ---
+function loadStats() {
+    const savedStats = localStorage.getItem('tarotStats');
+    if (savedStats) {
+        stats = JSON.parse(savedStats);
+        // Ensure all spread types from definitions exist in stats
+        Object.keys(spreadDefinitions).forEach(spreadType => {
+            if (!stats[spreadType]) {
+                stats[spreadType] = { totalDraws: 0, cards: {}, suits: {}, numbers: {}, reversals: 0 };
+            }
+        });
+        console.log('Stats loaded from localStorage.');
+    } else {
+        // Initialize with empty objects for each spread type
+        stats = {};
+        Object.keys(spreadDefinitions).forEach(spreadType => {
+            stats[spreadType] = {
+                totalDraws: 0,
+                cards: {},
+                suits: {},
+                numbers: {},
+                reversals: 0
+            };
+        });
+        console.log('No saved stats found, initialized new stats object.');
+    }
+}
 
-    if (currentSpread.length === 0) {
-        statsText.innerHTML = '<p>No statistics yet. Deal a spread to see its stats.</p>';
+function updateStats(spreadType, spread) {
+    const spreadStats = stats[spreadType];
+    if (!spreadStats) {
+        console.error(`Stats for spread type ${spreadType} not initialized.`);
         return;
     }
 
-    const spreadStats = {
-        suits: {},
-        numbers: {},
-        reversals: 0,
-        majorArcana: 0,
-        minorArcana: 0
-    };
+    spreadStats.totalDraws = (spreadStats.totalDraws || 0) + 1;
 
-    currentSpread.forEach(card => {
+    spread.forEach(card => {
+        spreadStats.cards[card.id] = (spreadStats.cards[card.id] || 0) + 1;
         spreadStats.suits[card.suit] = (spreadStats.suits[card.suit] || 0) + 1;
         spreadStats.numbers[card.number] = (spreadStats.numbers[card.number] || 0) + 1;
         if (card.isReversed) {
-            spreadStats.reversals++;
-        }
-        if (card.suit === 'Major Arcana') {
-            spreadStats.majorArcana++;
-        } else {
-            spreadStats.minorArcana++;
+            spreadStats.reversals = (spreadStats.reversals || 0) + 1;
         }
     });
+}
 
-    const totalCards = currentSpread.length;
-    const reversalRate = totalCards > 0 ? ((spreadStats.reversals / totalCards) * 100).toFixed(1) : 0;
+function saveStats() {
+    try {
+        localStorage.setItem('tarotStats', JSON.stringify(stats));
+    } catch (error) {
+        console.error('Error saving stats to localStorage:', error);
+    }
+}
 
-    let statsHTML = `<h2>Current Spread: ${spreadDefinitions[currentSpreadType].name}</h2>`;
-    statsHTML += `<p><strong>Total Cards:</strong> ${totalCards}</p>`;
-    statsHTML += `<p><strong>Reversed Cards:</strong> ${spreadStats.reversals} (${reversalRate}%)</p>`;
-    statsHTML += `<p><strong>Major Arcana:</strong> ${spreadStats.majorArcana}</p>`;
-    statsHTML += `<p><strong>Minor Arcana:</strong> ${spreadStats.minorArcana}</p>`;
+function displayStats(spreadType) {
+    if (!statsText || !deck.length) return; // Also wait for deck to be loaded
 
-    const createList = (data, title) => {
-        const items = Object.entries(data)
+    const spreadStats = stats[spreadType];
+    const spreadName = spreadDefinitions[spreadType]?.name || 'Spread';
+
+    if (!spreadStats || spreadStats.totalDraws === 0) {
+        statsText.innerHTML = `<h2>${spreadName} Statistics</h2><p>No statistics yet for this spread type. Deal a spread to begin.</p>`;
+        return;
+    }
+
+    // Helper to create sorted list items for card frequencies
+    const createCardList = (data) => {
+        const sortedItems = Object.entries(data)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 10) // Show top 10
+            .map(([cardId, count]) => {
+                const cardInfo = deck.find(c => c.id === cardId);
+                const cardName = cardInfo ? cardInfo.name : cardId.replace(/_/g, ' ');
+                return `<li>${cardName}: ${count}</li>`;
+            })
+            .join('');
+        return `<ul>${sortedItems}</ul>`;
+    };
+    
+    // Helper for simple lists
+    const createSimpleList = (data) => {
+         const sortedItems = Object.entries(data)
+            .sort(([, a], [, b]) => b - a)
             .map(([key, value]) => `<li>${key.replace(/_/g, ' ')}: ${value}</li>`)
             .join('');
-        return `<h3>${title}</h3><ul>${items}</ul>`;
+        return `<ul>${sortedItems}</ul>`;
     };
 
+    const totalCardsDrawn = Object.values(spreadStats.cards).reduce((a, b) => a + b, 0);
+    const reversalRate = totalCardsDrawn > 0 ? ((spreadStats.reversals / totalCardsDrawn) * 100).toFixed(1) : 0;
+
+    let statsHTML = `<h2>${spreadName} Statistics</h2>`;
+    statsHTML += `<p><strong>Total Times Drawn:</strong> ${spreadStats.totalDraws}</p>`;
+    statsHTML += `<p><strong>Total Cards Drawn in this Spread Type:</strong> ${totalCardsDrawn}</p>`;
+    statsHTML += `<p><strong>Reversal Rate:</strong> ${reversalRate}%</p>`;
+
+    if (Object.keys(spreadStats.cards).length > 0) {
+        statsHTML += `<h3>Most Frequent Cards (Top 10)</h3>${createCardList(spreadStats.cards)}`;
+    }
     if (Object.keys(spreadStats.suits).length > 0) {
-        statsHTML += createList(spreadStats.suits, 'Suit Frequency');
+        statsHTML += `<h3>Suit Frequency</h3>${createSimpleList(spreadStats.suits)}`;
     }
     if (Object.keys(spreadStats.numbers).length > 0) {
-        statsHTML += createList(spreadStats.numbers, 'Number/Rank Frequency');
+        statsHTML += `<h3>Number/Rank Frequency</h3>${createSimpleList(spreadStats.numbers)}`;
     }
 
     statsText.innerHTML = statsHTML;
