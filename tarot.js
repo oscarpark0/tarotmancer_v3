@@ -10,7 +10,7 @@ const statsArea = document.getElementById('statsArea');
 let deck = [];
 let currentSpread = [];
 let currentSpreadType = 'threeCard'; // Default spread
-let stats = {}; // For tracking card stats
+
 
 // --- Constants ---
 const INTERPRET_API_URL = '/interpret'; // Serverless function endpoint
@@ -61,8 +61,7 @@ const spreadDefinitions = {
 document.addEventListener('DOMContentLoaded', async () => {
     console.log('DOM fully loaded and parsed');
     await loadDeck();
-    loadStats();
-    displayStats();
+    displayStats(); // Initial call to clear stats area if needed
     setupEventListeners();
     setupResizeObserver();
 });
@@ -332,9 +331,7 @@ function handleDealSpread() {
         }));
 
         displaySpread(currentSpread);
-        updateStats(currentSpreadType, currentSpread);
-        saveStats();
-        displayStats();
+        displayStats(); // Update stats for the new spread
 
         // Enable interpretation button after a delay (e.g., after flip animation might finish)
         // Adjust timing based on animation duration using global constants
@@ -402,11 +399,11 @@ async function handleGetInterpretation() {
                     return;
                 }
                 accumulatedText += decoder.decode(value, { stream: true });
-                interpretationText.innerHTML = accumulatedText.replace(/\n/g, '<br>');
+                interpretationText.innerHTML = marked.parse(accumulatedText);
                 push();
             }).catch(err => {
-                console.error('Stream reading error:', err);
-                interpretationText.innerHTML += '<br><br>[Error reading stream]';
+                console.error('Error reading stream:', err);
+                interpretationText.textContent = 'Error displaying interpretation.';
                 interpretButton.disabled = false;
             });
         }
@@ -420,93 +417,57 @@ async function handleGetInterpretation() {
     }
 }
 
-// ... (rest of the code remains the same)
-function loadStats() {
-    const storedStats = localStorage.getItem('tarotStats');
-    if (storedStats) {
-        try {
-            stats = JSON.parse(storedStats);
-            console.log('Loaded stats from localStorage:', stats);
-        } catch (e) {
-            console.error('Error parsing stats from localStorage:', e);
-            stats = {}; // Reset if invalid
-        }
-    } else {
-        stats = {}; // Initialize if nothing stored
-    }
-}
-
-
-function updateStats(spreadType, spread) {
-    if (!stats[spreadType]) {
-        stats[spreadType] = {};
-    }
-
-    spread.forEach(card => {
-        const position = card.position;
-        const cardId = card.id; 
-
-        if (!stats[spreadType][position]) {
-            stats[spreadType][position] = {};
-        }
-        if (!stats[spreadType][position][cardId]) {
-            stats[spreadType][position][cardId] = 0;
-        }
-        stats[spreadType][position][cardId]++;
-    });
-    console.log('Updated stats:', stats);
-}
-
-function saveStats() {
-    try {
-        localStorage.setItem('tarotStats', JSON.stringify(stats));
-    } catch (e) {
-        console.error('Error saving stats to localStorage:', e);
-    }
-}
-
 function displayStats() {
-    let statsHtml = '<div class="stats-placeholder">No stats recorded yet.</div>';
-    if (Object.keys(stats).length > 0) {
-        statsHtml = '';
-        for (const spreadType in stats) {
-            const spreadName = spreadDefinitions[spreadType]?.name || spreadType;
-            statsHtml += `<div class="stats-spread-section">`;
-            statsHtml += `<h3>${spreadName}</h3>`;
+    if (!statsText) return;
 
-            for (const position in stats[spreadType]) {
-                statsHtml += `<div class="stats-position-section">`;
-                statsHtml += `<h4>${position}</h4>`;
-                
-                const positionStats = stats[spreadType][position];
-                const totalDrawsForPosition = Object.values(positionStats).reduce((sum, count) => sum + count, 0);
-
-                const sortedCards = Object.entries(positionStats)
-                                          .sort(([, countA], [, countB]) => countB - countA);
-
-                sortedCards.forEach(([cardId, count]) => {
-                    const cardInfo = deck.find(c => c.id === cardId);
-                    if (!cardInfo) return;
-
-                    const percentage = totalDrawsForPosition > 0 ? ((count / totalDrawsForPosition) * 100).toFixed(1) : 0;
-                    const cardName = cardInfo.name;
-
-                    statsHtml += `
-                        <div class="stats-row">
-                            <div class="stats-card-info">
-                                <img src="${cardInfo.image_url}" alt="${cardName}" class="stats-card-img"/>
-                                <span class="stats-card-name">${cardName}</span>
-                            </div>
-                            <div class="stats-bar-container">
-                                <div class="stats-bar" style="width: ${percentage}%;"></div>
-                            </div>
-                            <span class="stats-count">${count} (${percentage}%)</span>
-                        </div>`;
-                });
-                statsHtml += `</div>`; 
-            }
-            statsHtml += `</div>`; 
-        }
+    if (currentSpread.length === 0) {
+        statsText.innerHTML = '<p>No statistics yet. Deal a spread to see its stats.</p>';
+        return;
     }
-    statsText.innerHTML = statsHtml;
+
+    const spreadStats = {
+        suits: {},
+        numbers: {},
+        reversals: 0,
+        majorArcana: 0,
+        minorArcana: 0
+    };
+
+    currentSpread.forEach(card => {
+        spreadStats.suits[card.suit] = (spreadStats.suits[card.suit] || 0) + 1;
+        spreadStats.numbers[card.number] = (spreadStats.numbers[card.number] || 0) + 1;
+        if (card.isReversed) {
+            spreadStats.reversals++;
+        }
+        if (card.suit === 'Major Arcana') {
+            spreadStats.majorArcana++;
+        } else {
+            spreadStats.minorArcana++;
+        }
+    });
+
+    const totalCards = currentSpread.length;
+    const reversalRate = totalCards > 0 ? ((spreadStats.reversals / totalCards) * 100).toFixed(1) : 0;
+
+    let statsHTML = `<h2>Current Spread: ${spreadDefinitions[currentSpreadType].name}</h2>`;
+    statsHTML += `<p><strong>Total Cards:</strong> ${totalCards}</p>`;
+    statsHTML += `<p><strong>Reversed Cards:</strong> ${spreadStats.reversals} (${reversalRate}%)</p>`;
+    statsHTML += `<p><strong>Major Arcana:</strong> ${spreadStats.majorArcana}</p>`;
+    statsHTML += `<p><strong>Minor Arcana:</strong> ${spreadStats.minorArcana}</p>`;
+
+    const createList = (data, title) => {
+        const items = Object.entries(data)
+            .map(([key, value]) => `<li>${key.replace(/_/g, ' ')}: ${value}</li>`)
+            .join('');
+        return `<h3>${title}</h3><ul>${items}</ul>`;
+    };
+
+    if (Object.keys(spreadStats.suits).length > 0) {
+        statsHTML += createList(spreadStats.suits, 'Suit Frequency');
+    }
+    if (Object.keys(spreadStats.numbers).length > 0) {
+        statsHTML += createList(spreadStats.numbers, 'Number/Rank Frequency');
+    }
+
+    statsText.innerHTML = statsHTML;
 }
