@@ -54,7 +54,6 @@ const spreadDefinitions = {
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('DOM fully loaded and parsed');
     await loadDeck();
     loadStats(); // Load stats from localStorage
     displayStats(); // Display initial stats

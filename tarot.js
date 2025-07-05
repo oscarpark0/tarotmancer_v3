@@ -60,7 +60,6 @@ const spreadDefinitions = {
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', async () => {
-    console.log('DOM fully loaded and parsed');
     await loadDeck();
     loadStats();
     displayStats(currentSpreadType);
@@ -69,19 +68,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadDeck() {
-    console.log('Loading deck...');
     try {
         const response = await fetch('tarot_data.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        deck = Object.entries(data).map(([key, cardData]) => ({
-            id: key,
-            ...cardData,
-            name: cardData.name || key.replace(/_/g, ' ')
-        }));
-        console.log(`Deck loaded with ${deck.length} cards.`);
+        deck = Object.entries(data).map(([key, cardData]) => {
+            const newCard = {
+                id: key,
+                ...cardData,
+                name: cardData.name || key.replace(/_/g, ' ')
+            };
+            // Manually assign suit for Major Arcana for consistent data structure
+            if (newCard.arcana === 'major') {
+                newCard.suit = 'Major Arcana';
+            }
+            return newCard;
+        });
         if (dealButton) {
             dealButton.disabled = false;
         }
@@ -93,7 +97,6 @@ async function loadDeck() {
 }
 
 function setupEventListeners() {
-    console.log('Setting up event listeners...');
     // Spread selection buttons
     const spreadButtons = document.querySelectorAll('.spread-button');
     spreadButtons.forEach(btn => {
@@ -261,15 +264,12 @@ function scaleSpreadArea() {
          spreadArea.style.minHeight = baseHeight;
     }
 
-    console.log(`Spread Area Scaled: Type=${currentSpreadType}, AvailableWidth=${availableWidth}, Scale=${scaleFactor.toFixed(2)}, MinHeight=${spreadArea.style.minHeight}`);
-
     // Sync the height of the interpretation/stats area with the spread area wrapper
     requestAnimationFrame(() => {
         const wrapperHeight = spreadAreaWrapper.offsetHeight;
         if (wrapperHeight > 0) { 
             interpretationArea.style.height = `${wrapperHeight}px`;
             statsArea.style.height = `${wrapperHeight}px`; 
-            console.log(`Interpretation/Stats area height set to: ${wrapperHeight}px`);
         } else {
             console.warn('Could not get valid spreadAreaWrapper height.');
         }
@@ -285,11 +285,9 @@ function setupResizeObserver() {
     });
 
     resizeObserver.observe(spreadAreaWrapper);
-    console.log('ResizeObserver set up for spreadAreaWrapper');
 }
 
 function handleDealSpread() {
-    console.log(`Dealing spread: ${currentSpreadType}`);
     if (deck.length === 0) {
         console.error('Deck not loaded.');
         return;
@@ -399,7 +397,6 @@ async function handleGetInterpretation() {
         function push() {
             reader.read().then(({ done, value }) => {
                 if (done) {
-                    console.log('Stream complete');
                     interpretButton.disabled = false;
                     return;
                 }
@@ -474,8 +471,14 @@ function updateStats(spreadType, spread) {
 
     spread.forEach(card => {
         spreadStats.cards[card.id] = (spreadStats.cards[card.id] || 0) + 1;
-        spreadStats.suits[card.suit] = (spreadStats.suits[card.suit] || 0) + 1;
-        spreadStats.numbers[card.number] = (spreadStats.numbers[card.number] || 0) + 1;
+        // Count suit, using 'Major Arcana' if suit is not defined
+        const suit = card.suit || 'Major Arcana';
+        spreadStats.suits[suit] = (spreadStats.suits[suit] || 0) + 1;
+
+        // Only count numbers for Minor Arcana
+        if (card.arcana === 'minor') {
+            spreadStats.numbers[card.number] = (spreadStats.numbers[card.number] || 0) + 1;
+        }
         if (card.isReversed) {
             spreadStats.reversals = (spreadStats.reversals || 0) + 1;
         }
