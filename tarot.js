@@ -361,63 +361,66 @@ async function handleGetInterpretation() {
     // Activate the interpretation tab
     document.querySelector('.tab-button[data-tab="interpretation"]').click();
 
-    interpretationText.textContent = 'Getting interpretation...';
+    interpretationText.innerHTML = ''; // Clear previous text
+    let accumulatedText = '';
     interpretButton.disabled = true;
 
+    const spreadDetails = currentSpread.map((card, index) => {
+        const position = spreadDefinitions[currentSpreadType]?.positions[index] || `Card ${index + 1}`;
+        const reversed = card.isReversed ? ' (Reversed)' : '';
+        return `${position}: ${card.name}${reversed}`;
+    }).join('\n');
+
+    const prompt = `Provide a tarot reading interpretation for the following ${spreadDefinitions[currentSpreadType].name} spread:\n\n${spreadDetails}\n\nPlease provide a concise, insightful interpretation focusing on the interplay between the cards in their positions.`;
+
     try {
-        // Construct the prompt for the API
-        const spreadDetails = currentSpread.map((card, index) => {
-            const position = spreadDefinitions[currentSpreadType]?.positions[index] || `Card ${index + 1}`;
-            const reversed = card.isReversed ? ' (Reversed)' : '';
-            return `${position}: ${card.name}${reversed}`;
-        }).join('\n');
-
-        const prompt = `Provide a tarot reading interpretation for the following ${spreadDefinitions[currentSpreadType].name} spread:\n\n${spreadDetails}\n\nPlease provide a concise, insightful interpretation focusing on the interplay between the cards in their positions.`;
-
-        // Prepare the request body for our serverless function
-        const requestBody = {
-            model: "claude-3-7-sonnet-20250219", // Use a powerful model
-            max_tokens: 2048,
-            messages: [
-                { role: "user", content: prompt }
-            ]
-        };
-
-        // Call our serverless function endpoint
-        const response = await fetch('/api/interpret', { // CORRECTED PATH
+        const response = await fetch('/api/interpret', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(requestBody)
+            body: JSON.stringify({
+                model: "claude-3-haiku-20240307",
+                max_tokens: 2048,
+                messages: [{ role: "user", content: prompt }]
+            }),
         });
 
-        const data = await response.json();
-
         if (!response.ok) {
-            // Handle errors returned from our serverless function
-            console.error('Error from serverless function:', data);
-            throw new Error(data.error || `Server responded with status ${response.status}`);
+            const errorData = await response.json().catch(() => ({ error: 'Failed to parse error response.' }));
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
 
-        // Extract the interpretation text from the correct place in the Anthropic response structure
-        if (data.content && data.content.length > 0 && data.content[0].text) {
-            interpretationText.textContent = data.content[0].text;
-        } else {
-            console.error('Unexpected response structure:', data);
-            interpretationText.textContent = 'Could not extract interpretation from response.';
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        function push() {
+            reader.read().then(({ done, value }) => {
+                if (done) {
+                    console.log('Stream complete');
+                    interpretButton.disabled = false;
+                    return;
+                }
+                accumulatedText += decoder.decode(value, { stream: true });
+                interpretationText.innerHTML = accumulatedText.replace(/\n/g, '<br>');
+                push();
+            }).catch(err => {
+                console.error('Stream reading error:', err);
+                interpretationText.innerHTML += '<br><br>[Error reading stream]';
+                interpretButton.disabled = false;
+            });
         }
+
+        push();
 
     } catch (error) {
         console.error('Error getting interpretation:', error);
-        // Display a user-friendly message, including the error if possible
-        interpretationText.textContent = `Error getting interpretation: ${error.message}`;
-    } finally {
+        interpretationText.textContent = `Error: ${error.message}`;
         interpretButton.disabled = false;
     }
 }
 
-// --- Statistics Handling ---
+// ... (rest of the code remains the same)
 function loadStats() {
     const storedStats = localStorage.getItem('tarotStats');
     if (storedStats) {
