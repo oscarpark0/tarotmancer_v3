@@ -426,14 +426,27 @@ async function handleGetInterpretation() {
 function loadStats() {
     const savedStats = localStorage.getItem('tarotStats');
     if (savedStats) {
-        stats = JSON.parse(savedStats);
-        // Ensure all spread types from definitions exist in stats
+        try {
+            stats = JSON.parse(savedStats) || {};
+        } catch (e) {
+            console.error('Error parsing stats from localStorage:', e);
+            stats = {};
+        }
+
+        // Ensure all spread types from definitions exist in stats and have the correct structure
         Object.keys(spreadDefinitions).forEach(spreadType => {
             if (!stats[spreadType]) {
                 stats[spreadType] = { totalDraws: 0, cards: {}, suits: {}, numbers: {}, reversals: 0 };
+            } else {
+                // Ensure sub-properties exist to prevent errors with old data structures
+                stats[spreadType].totalDraws = stats[spreadType].totalDraws || 0;
+                stats[spreadType].cards = stats[spreadType].cards || {};
+                stats[spreadType].suits = stats[spreadType].suits || {};
+                stats[spreadType].numbers = stats[spreadType].numbers || {};
+                stats[spreadType].reversals = stats[spreadType].reversals || 0;
             }
         });
-        console.log('Stats loaded from localStorage.');
+        console.log('Stats loaded and validated from localStorage.');
     } else {
         // Initialize with empty objects for each spread type
         stats = {};
