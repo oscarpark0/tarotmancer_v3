@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tarotmancer</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script
+    src="https://app.rybbit.io/api/script.js"
+    data-site-id="727"
+    defer
+></script>
+</head>
+<body>
+    <div class="container">
+        <h1>tarotmancer</h1>
+
+        <div id="controls" class="controls-area">
+            <div class="spread-selector">
+                <span>Select Spread:</span>
+                <div class="spread-buttons">
+                    <button class="spread-button active" data-spread="threeCard">3 Card</button>
+                    <button class="spread-button" data-spread="celticCross">Celtic Cross</button>
+                    <button class="spread-button" data-spread="horseshoe">Horseshoe</button>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <button id="dealButton" disabled>Deal</button>
+            </div>
+        </div>
+
+        <div id="spreadAreaWrapper" class="spread-area-wrapper">
+            <div id="spreadArea" class="spread-area"></div>
+        </div>
+
+        <div class="output-area">
+            <div id="stats-controls" class="tab-header">
+                <button class="tab-button active" data-tab="interpretation">Interpretation</button>
+                <button class="tab-button" data-tab="stats">Statistics</button>
+            </div>
+            <div class="tab-content">
+                <div id="interpretationArea" class="interpretation-area">
+                    <button id="interpretButton" disabled>Get Interpretation</button>
+                    <div id="interpretationText"> </div>
+                </div>
+                <div id="statsArea" class="stats-area hidden">
+                    <h2>Stats</h2>
+                    <div id="statsText"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="tarot.js"></script>
+</body>
+</html>

@@ -1,59 +1,280 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tarotmancer</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <script
-    src="https://app.rybbit.io/api/script.js"
-    data-site-id="727"
-    defer
-></script>
+  <meta charset="UTF-8">
+  <title>tarotmancer - Enter</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+    #tarot-container {
+      z-index: 2;
+      position: relative;
+      perspective: 1000px;
+    }
+    .tarot-card {
+      position: absolute;
+      width: 90px;
+      height: 140px;
+      opacity: 0;
+      transform-style: preserve-3d;
+      transform: scale(0) rotateY(180deg) translateZ(0);
+      transition: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .tarot-card.dealing {
+      animation: dealAndFloat 1.5s ease-out forwards;
+    }
+    .tarot-card.floating {
+      opacity: 0.9;
+      box-shadow: 0 0 15px rgba(147, 112, 219, 0.25),
+                  0 0 30px rgba(147, 112, 219, 0.15),
+                  0 0 60px rgba(147, 112, 219, 0.1);
+      animation: gentleFloat 5s ease-in-out infinite, cardAura 3s infinite alternate;
+    }
+    .tarot-card:hover {
+      transform: translateY(-20px) scale(1.1) translateZ(50px) !important;
+      z-index: 1000 !important;
+      box-shadow: 0 20px 40px rgba(147, 112, 219, 0.8),
+                  0 40px 80px rgba(147, 112, 219, 0.4),
+                  inset 0 0 30px rgba(255, 255, 255, 0.3);
+    }
+    .tarot-card img {
+      width: 100%;
+      height: 100%;
+      border-radius: 6px;
+      filter: saturate(1.2);
+      backface-visibility: hidden;
+    }
+
+    @keyframes dealAndFloat {
+      0% {
+        opacity: 0;
+        transform: translateX(50vw) translateY(-100vh) scale(0.8) rotateY(180deg) rotateZ(720deg);
+      }
+      50% {
+        opacity: 0.5;
+        transform: translateX(0) translateY(-20px) scale(0.9) rotateY(90deg) rotateZ(360deg);
+      }
+      100% {
+        opacity: 0.9;
+        transform: translateX(0) translateY(0) scale(var(--final-scale)) rotateY(0deg) rotateZ(var(--final-rotation));
+      }
+    }
+    @keyframes cardAura {
+      0% { 
+        box-shadow: 0 0 15px rgba(147, 112, 219, 0.25),
+                    0 0 30px rgba(147, 112, 219, 0.15),
+                    0 0 60px rgba(147, 112, 219, 0.1);
+      }
+      100% { 
+        box-shadow: 0 0 25px rgba(147, 112, 219, 0.3),
+                    0 0 50px rgba(147, 112, 219, 0.2),
+                    0 0 90px rgba(147, 112, 219, 0.15);
+      }
+    }
+    @keyframes gentleFloat {
+      0%, 100% { 
+        transform: translateY(0) scale(var(--final-scale)) rotate(var(--final-rotation)); 
+      }
+      50% { 
+        transform: translateY(-8px) scale(var(--final-scale)) rotate(var(--final-rotation)); 
+      }
+    }
+    .enter-container {
+        position: relative;
+        z-index: 100;
+        text-align: center;
+    }
+    #enterButton {
+        background-color: rgba(0, 20, 0, 0.8);
+        border: 2px solid #00FF00;
+        padding: 15px 30px;
+        font-size: 20px;
+        font-weight: 600;
+        border-radius: 6px;
+        color: #00FF00;
+        font-family: 'Courier New', Courier, monospace;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        box-shadow: 0 0 10px rgba(0, 255, 0, 0.4);
+    }
+    #enterButton:hover {
+        background-color: rgba(0, 255, 0, 0.15);
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>tarotmancer</h1>
+  <canvas id="stars-canvas"></canvas>
+  <div id="tarot-container"></div>
 
-        <div id="controls" class="controls-area">
-            <div class="spread-selector">
-                <span>Select Spread:</span>
-                <div class="spread-buttons">
-                    <button class="spread-button active" data-spread="threeCard">3 Card</button>
-                    <button class="spread-button" data-spread="celticCross">Celtic Cross</button>
-                    <button class="spread-button" data-spread="horseshoe">Horseshoe</button>
-                </div>
-            </div>
-            <div class="action-buttons">
-                <button id="dealButton" disabled>Deal</button>
-            </div>
-        </div>
+  <div class="enter-container">
+    <button id="enterButton" onclick="window.location.href='main.html'">Enter</button>
+  </div>
 
-        <div id="spreadAreaWrapper" class="spread-area-wrapper">
-            <div id="spreadArea" class="spread-area"></div>
-        </div>
+  <script>
+    const tarotCards = [
+      { id: "m16", name: "The Tower", arcana: "major", description: "Sudden change, revelation, upheaval", image_url: "https://ik.imagekit.io/tarotmancer/m16.webp" },
+    ];
 
-        <div class="output-area">
-            <div id="stats-controls" class="tab-header">
-                <button class="tab-button active" data-tab="interpretation">Interpretation</button>
-                <button class="tab-button" data-tab="stats">Statistics</button>
-            </div>
-            <div class="tab-content">
-                <div id="interpretationArea" class="interpretation-area">
-                    <button id="interpretButton" disabled>Get Interpretation</button>
-                    <div id="interpretationText"> </div>
-                </div>
-                <div id="statsArea" class="stats-area hidden">
-                    <h2>Stats</h2>
-                    <div id="statsText"></div>
-                </div>
-            </div>
-        </div>
+    let cardDealInterval;
+    let currentCardIndex = 0;
 
-    </div>
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    
+    function getRandomPosition() {
+      return {
+        x: getRandomInt(50, window.innerWidth - 140),
+        y: getRandomInt(50, window.innerHeight - 190)
+      };
+    }
+    
+    function createStarField() {
+      const starsCanvas = document.getElementById('stars-canvas');
+      const starsCtx = starsCanvas.getContext('2d');
+      starsCanvas.width = window.innerWidth;
+      starsCanvas.height = window.innerHeight;
+      
+      const staticStars = [];
+      for (let i = 0; i < 200; i++) {
+        staticStars.push({
+            x: Math.random() * starsCanvas.width,
+            y: Math.random() * starsCanvas.height,
+            radius: Math.random() * 0.5,
+            opacity: Math.random() * 0.8 + 0.2
+        });
+      }
 
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="tarot.js"></script>
+      const twinklingStars = [];
+      for (let i = 0; i < 50; i++) {
+        twinklingStars.push({
+          x: Math.random() * starsCanvas.width,
+          y: Math.random() * starsCanvas.height,
+          radius: Math.random() * 2 + 0.5,
+          opacity: Math.random(),
+          twinkleSpeed: Math.random() * 0.0005 + 0.00001
+        });
+      }
+      
+      function animateTwinklingStars() {
+        starsCtx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
+        
+        staticStars.forEach(star => {
+            starsCtx.beginPath();
+            starsCtx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+            starsCtx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+            starsCtx.fill();
+        });
+        
+        twinklingStars.forEach(star => {
+          star.opacity += star.twinkleSpeed;
+          if (star.opacity > 1 || star.opacity < 0) {
+            star.twinkleSpeed = -star.twinkleSpeed;
+          }
+          
+          starsCtx.beginPath();
+          starsCtx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+          starsCtx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+          starsCtx.fill();
+          
+          starsCtx.shadowBlur = getRandomInt(-0.001, 0.001);
+          starsCtx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+          starsCtx.fill();
+          starsCtx.shadowBlur = 0;
+        });
+        
+        requestAnimationFrame(animateTwinklingStars);
+      }
+      
+      animateTwinklingStars();
+    }
+    
+    function dealCard() {
+      if (currentCardIndex >= tarotCards.length) {
+        currentCardIndex = 0;
+      }
+      
+      const cardData = tarotCards[currentCardIndex];
+      const position = getRandomPosition();
+      
+      const cardDiv = document.createElement('div');
+      cardDiv.className = 'tarot-card';
+      cardDiv.dataset.cardId = cardData.id;
+      
+      const depth = getRandomInt(10, 50);
+      cardDiv.style.zIndex = depth;
+      
+      const rotation = getRandomInt(-15, 15);
+      const scale = 0.8 + (depth / 50) * 0.4;
+      
+      cardDiv.style.setProperty('--final-scale', scale);
+      cardDiv.style.setProperty('--final-rotation', rotation + 'deg');
+      
+      cardDiv.style.left = position.x + 'px';
+      cardDiv.style.top = position.y + 'px';
+      
+      const img = document.createElement('img');
+      img.src = cardData.image_url;
+      img.alt = cardData.name;
+      img.title = `${cardData.name}: ${cardData.description}`;
+      
+      cardDiv.appendChild(img);
+      document.getElementById('tarot-container').appendChild(cardDiv);
+      
+      setTimeout(() => {
+        cardDiv.classList.add('dealing');
+      }, 50);
+      
+      setTimeout(() => {
+        cardDiv.classList.remove('dealing');
+        cardDiv.classList.add('floating');
+      }, 1500);
+      
+      const allCards = document.querySelectorAll('.tarot-card');
+      if (allCards.length > 12) {
+        const oldCard = allCards[0];
+        
+        oldCard.style.transition = 'opacity 0.8s ease, transform 0.8s ease, filter 0.8s ease';
+        oldCard.style.opacity = '0';
+        oldCard.style.transform = 'scale(0.3) rotateY(180deg)';
+        oldCard.style.filter = 'brightness(2) blur(5px)';
+        
+        setTimeout(() => {
+          if (oldCard.parentNode) {
+            oldCard.remove();
+          }
+        }, 800);
+      }
+      
+      currentCardIndex++;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      createStarField();
+      dealCard();
+      cardDealInterval = setInterval(dealCard, getRandomInt(2000, 15000)); 
+    });
+  </script>
 </body>
 </html>
