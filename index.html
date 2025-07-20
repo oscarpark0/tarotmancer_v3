@@ -121,14 +121,51 @@
         background-color: rgba(0, 255, 0, 0.15);
         box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
     }
+
+    #crt-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #000;
+        z-index: 9999;
+        transform: scaleY(0);
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    #crt-overlay.active {
+        animation: crt-on 0.7s forwards;
+    }
+
+    @keyframes crt-on {
+        0% {
+            transform: scaleY(0.005) scaleX(0.1);
+            opacity: 1;
+        }
+        20% {
+            transform: scaleY(0.005) scaleX(1);
+            opacity: 1;
+        }
+        60% {
+            transform: scaleY(1) scaleX(1);
+            opacity: 1;
+        }
+        100% {
+            transform: scaleY(1) scaleX(1);
+            opacity: 1;
+        }
+    }
   </style>
 </head>
 <body>
   <canvas id="stars-canvas"></canvas>
   <div id="tarot-container"></div>
 
+  <div id="crt-overlay"></div>
   <div class="enter-container">
-    <button id="enterButton" onclick="window.location.href='main.html'">Enter</button>
+    <button id="enterButton">Enter</button>
   </div>
 
   <script>
@@ -355,7 +392,17 @@
     document.addEventListener('DOMContentLoaded', () => {
       createStarField();
       dealCard();
-      cardDealInterval = setInterval(dealCard, getRandomInt(2000, 15000)); 
+      cardDealInterval = setInterval(dealCard, getRandomInt(2000, 15000));
+
+      const enterButton = document.getElementById('enterButton');
+      const crtOverlay = document.getElementById('crt-overlay');
+
+      enterButton.addEventListener('click', () => {
+        crtOverlay.classList.add('active');
+        setTimeout(() => {
+          window.location.href = 'main.html';
+        }, 700); // Match animation duration
+      });
     });
   </script>
 </body>
