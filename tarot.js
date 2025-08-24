@@ -61,6 +61,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     displayStats(currentSpreadType);
     setupEventListeners();
     setupResizeObserver();
+
+    // Keyboard shortcuts: D = Deal, I = Interpret, R = Reroll stars (if present)
+    document.addEventListener('keydown', (e) => {
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) return;
+        const key = e.key.toLowerCase();
+        if (key === 'd' && dealButton && !dealButton.disabled) {
+            e.preventDefault();
+            handleDealSpread();
+        } else if (key === 'i' && interpretButton && !interpretButton.disabled) {
+            e.preventDefault();
+            handleGetInterpretation();
+        } else if (key === 'r' && window.skyMain && typeof window.skyMain.reRoll === 'function') {
+            e.preventDefault();
+            window.skyMain.reRoll();
+        }
+    });
 });
 
 async function loadDeck() {

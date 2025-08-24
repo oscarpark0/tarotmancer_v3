@@ -5,6 +5,7 @@
   <title>tarotmancer - Enter</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
   <link rel="stylesheet" href="styles.css">
+  <script src="starfield.js"></script>
   <style>
     body {
       margin: 0;
@@ -124,7 +125,6 @@
   </style>
 </head>
 <body>
-  <canvas id="stars-canvas"></canvas>
   <div id="tarot-container"></div>
 
   <div class="enter-container">
@@ -232,65 +232,7 @@
       };
     }
     
-    function createStarField() {
-      const starsCanvas = document.getElementById('stars-canvas');
-      const starsCtx = starsCanvas.getContext('2d');
-      starsCanvas.width = window.innerWidth;
-      starsCanvas.height = window.innerHeight;
-      
-      const staticStars = [];
-      for (let i = 0; i < 200; i++) {
-        staticStars.push({
-            x: Math.random() * starsCanvas.width,
-            y: Math.random() * starsCanvas.height,
-            radius: Math.random() * 0.5,
-            opacity: Math.random() * 0.8 + 0.2
-        });
-      }
-
-      const twinklingStars = [];
-      for (let i = 0; i < 50; i++) {
-        twinklingStars.push({
-          x: Math.random() * starsCanvas.width,
-          y: Math.random() * starsCanvas.height,
-          radius: Math.random() * 2 + 0.5,
-          opacity: Math.random(),
-          twinkleSpeed: Math.random() * 0.0005 + 0.00001
-        });
-      }
-      
-      function animateTwinklingStars() {
-        starsCtx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
-        
-        staticStars.forEach(star => {
-            starsCtx.beginPath();
-            starsCtx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-            starsCtx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
-            starsCtx.fill();
-        });
-        
-        twinklingStars.forEach(star => {
-          star.opacity += star.twinkleSpeed;
-          if (star.opacity > 1 || star.opacity < 0) {
-            star.twinkleSpeed = -star.twinkleSpeed;
-          }
-          
-          starsCtx.beginPath();
-          starsCtx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-          starsCtx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
-          starsCtx.fill();
-          
-          starsCtx.shadowBlur = getRandomInt(-0.001, 0.001);
-          starsCtx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-          starsCtx.fill();
-          starsCtx.shadowBlur = 0;
-        });
-        
-        requestAnimationFrame(animateTwinklingStars);
-      }
-      
-      animateTwinklingStars();
-    }
+    // CSS starfield is initialized on DOMContentLoaded via initStarfield()
     
     function dealCard() {
       if (currentCardIndex >= tarotCards.length) {
@@ -352,10 +294,19 @@
       currentCardIndex++;
     }
 
+    function scheduleNextDeal() {
+      const delay = getRandomInt(2000, 15000);
+      cardDealInterval = setTimeout(() => {
+        dealCard();
+        scheduleNextDeal();
+      }, delay);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
-      createStarField();
+      // Initialize background starfield behind content
+      initStarfield({ count: 260, zIndex: 0, maxSize: 2.4, minSize: 0.6, layers: 4 });
       dealCard();
-      cardDealInterval = setInterval(dealCard, getRandomInt(2000, 15000)); 
+      scheduleNextDeal();
     });
   </script>
 </body>

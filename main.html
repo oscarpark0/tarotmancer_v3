@@ -6,6 +6,7 @@
     <title>tarotmancer</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="starfield.js"></script>
     <script
     src="https://app.rybbit.io/api/script.js"
     data-site-id="727"
@@ -54,6 +55,12 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        // Initialize a calm starfield behind the reading UI
+        window.skyMain = initStarfield({ count: 220, zIndex: 0, maxSize: 2.2, minSize: 0.6, layers: 3 });
+      });
+    </script>
     <script src="tarot.js"></script>
 </body>
 </html>
