@@ -52,7 +52,7 @@
       pointer-events: auto; /* keep cards hoverable/clickable */
     }
     .tarot-card.dealing {
-      animation: dealAndFloat 1.5s ease-out forwards;
+      animation: dealAndFloat 1.5s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
     }
     .tarot-card.floating {
       opacity: 0.9;
@@ -79,11 +79,11 @@
     @keyframes dealAndFloat {
       0% {
         opacity: 0;
-        transform: translateX(50vw) translateY(-100vh) scale(0.8) rotateY(180deg) rotateZ(720deg);
+        transform: translateX(50vw) translateY(-100vh) scale(0.9) rotateY(120deg) rotateZ(calc(var(--final-rotation) - 18deg));
       }
       50% {
         opacity: 0.5;
-        transform: translateX(0) translateY(-20px) scale(0.9) rotateY(90deg) rotateZ(360deg);
+        transform: translateX(0) translateY(-16px) scale(0.95) rotateY(40deg) rotateZ(calc(var(--final-rotation) + 6deg));
       }
       100% {
         opacity: 0.9;
@@ -104,10 +104,10 @@
     }
     @keyframes gentleFloat {
       0%, 100% { 
-        transform: translateY(0) scale(var(--final-scale)) rotate(var(--final-rotation)); 
+        transform: translateY(0) scale(var(--final-scale)) rotate(calc(var(--final-rotation) + var(--float-tilt, 0deg))); 
       }
       50% { 
-        transform: translateY(-8px) scale(var(--final-scale)) rotate(var(--final-rotation)); 
+        transform: translateY(-8px) scale(var(--final-scale)) rotate(calc(var(--final-rotation) - var(--float-tilt, 0deg))); 
       }
     }
     .enter-container {
@@ -258,11 +258,13 @@
       const depth = getRandomInt(10, 50);
       cardDiv.style.zIndex = depth;
       
-      const rotation = getRandomInt(-15, 15);
-      const scale = 0.8 + (depth / 50) * 0.4;
+      const rotation = getRandomInt(-12, 12);
+      const scale = 0.85 + (depth / 50) * 0.35;
       
       cardDiv.style.setProperty('--final-scale', scale);
       cardDiv.style.setProperty('--final-rotation', rotation + 'deg');
+      const floatTilt = getRandomInt(1, 3);
+      cardDiv.style.setProperty('--float-tilt', floatTilt + 'deg');
       
       cardDiv.style.left = position.x + 'px';
       cardDiv.style.top = position.y + 'px';
