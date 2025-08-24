@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="starfield.js"></script>
     <style>
-      /* Smooth page fade-in to complement index portal transition */
       html, body { background: #000; }
       body { opacity: 0; filter: blur(6px); transform: scale(0.985); }
       body.page-enter { 
@@ -18,9 +17,30 @@
         transition: opacity 520ms ease, filter 700ms ease, transform 700ms ease;
         will-change: opacity, filter, transform;
       }
+      #entry-veil {
+        position: fixed; inset: 0; z-index: 999;
+        pointer-events: none; opacity: 1; visibility: visible;
+        background:
+          radial-gradient(120vh 120vh at 50% 50%, rgba(0,255,140,0.12), rgba(0,0,0,0) 60%),
+          radial-gradient(200vh 140vh at 50% -20%, rgba(0,255,60,0.08), rgba(0,0,0,0) 55%),
+          #000;
+      }
+      #entry-veil::before {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(60vh 60vh at 50% 50%, rgba(0,255,120,0.15), rgba(0,0,0,0) 55%);
+        mix-blend-mode: screen; filter: blur(2px);
+      }
+      #entry-veil::after {
+        content: '';
+        position: absolute; inset: 0;
+        background: radial-gradient(120vh 80vh at 50% 110%, rgba(0,0,0,0), rgba(0,0,0,0.85) 80%);
+      }
+      #entry-veil.veil-hide { opacity: 0; visibility: hidden; transition: opacity 600ms ease, visibility 0s linear 600ms; }
       @media (prefers-reduced-motion: reduce) {
         body { filter: none; transform: none; }
         body.page-enter { transition: none; }
+        #entry-veil.veil-hide { transition: none; }
       }
     </style>
     <script
@@ -30,6 +50,7 @@
 ></script>
 </head>
 <body>
+    <div id="entry-veil" aria-hidden="true"></div>
     <div class="container">
         <h1>tarotmancer</h1>
 
@@ -73,9 +94,9 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
-        // Begin fade-in on next frame to ensure styles are applied
         requestAnimationFrame(() => document.body.classList.add('page-enter'));
-        // Initialize a calm starfield behind the reading UI
+        const veil = document.getElementById('entry-veil');
+        setTimeout(() => veil && veil.classList.add('veil-hide'), 60);
         window.skyMain = initStarfield({ count: 220, zIndex: 0, maxSize: 2.2, minSize: 0.6, layers: 3 });
       });
     </script>
