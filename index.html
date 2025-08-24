@@ -25,8 +25,13 @@
     }
     #tarot-container {
       z-index: 2;
-      position: relative;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
       perspective: 1000px;
+      pointer-events: none; /* don't block the Enter button */
     }
     .tarot-card {
       position: absolute;
@@ -38,6 +43,7 @@
       transition: none;
       border-radius: 6px;
       cursor: pointer;
+      pointer-events: auto; /* keep cards hoverable/clickable */
     }
     .tarot-card.dealing {
       animation: dealAndFloat 1.5s ease-out forwards;
@@ -226,10 +232,16 @@
     }
     
     function getRandomPosition() {
-      return {
-        x: getRandomInt(50, window.innerWidth - 140),
-        y: getRandomInt(50, window.innerHeight - 190)
-      };
+      const margin = 20;
+      const cardW = 90;
+      const cardH = 140;
+      const minX = margin;
+      const minY = margin;
+      const maxX = Math.max(minX, window.innerWidth - cardW - margin);
+      const maxY = Math.max(minY, window.innerHeight - cardH - margin);
+      const x = getRandomInt(minX, maxX);
+      const y = getRandomInt(minY, maxY);
+      return { x, y };
     }
     
     // CSS starfield is initialized on DOMContentLoaded via initStarfield()
