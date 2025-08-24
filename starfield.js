@@ -12,6 +12,10 @@
       container: document.body,
       parallax: true,
       layers: 3,
+      // reroll controls: keep background stable by default
+      reroll: false,
+      rerollMinMs: 20000,
+      rerollMaxMs: 40000,
     }, options);
 
     const sky = createEl('div', 'starry-sky');
@@ -84,9 +88,20 @@
       });
     };
 
-    const rerollMs = Math.floor(rand(12000, 24000));
-    const interval = setInterval(() => sky.reRoll(), rerollMs);
-    sky.addEventListener('remove', () => clearInterval(interval));
+    // Keep stars stable unless explicitly enabled and motion not reduced
+    if (opts.reroll) {
+      const mq2 = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if (!mq2.matches) {
+        const min = Math.max(1000, Number(opts.rerollMinMs) || 20000);
+        const max = Math.max(min + 1000, Number(opts.rerollMaxMs) || 40000);
+        const rerollMs = Math.floor(rand(min, max));
+        const interval = setInterval(() => sky.reRoll(), rerollMs);
+        // best-effort cleanup
+        const cleanup = () => clearInterval(interval);
+        window.addEventListener('beforeunload', cleanup, { once: true });
+        sky.addEventListener('DOMNodeRemovedFromDocument', cleanup, { once: true });
+      }
+    }
 
     return sky;
   }

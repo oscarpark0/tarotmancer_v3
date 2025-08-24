@@ -104,10 +104,12 @@
     }
     @keyframes gentleFloat {
       0%, 100% { 
-        transform: translateY(0) scale(var(--final-scale)) rotate(calc(var(--final-rotation) + var(--float-tilt, 0deg))); 
+        /* Match dealAndFloat 100% exactly to avoid snap */
+        transform: translateY(0) scale(var(--final-scale)) rotate(var(--final-rotation)); 
       }
       50% { 
-        transform: translateY(-8px) scale(var(--final-scale)) rotate(calc(var(--final-rotation) - var(--float-tilt, 0deg))); 
+        /* Introduce subtle sway after entry */
+        transform: translateY(-8px) scale(var(--final-scale)) rotate(calc(var(--final-rotation) + var(--float-tilt, 0deg))); 
       }
     }
     .enter-container {
