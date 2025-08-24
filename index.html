@@ -6,6 +6,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
   <link rel="stylesheet" href="styles.css">
   <script src="starfield.js"></script>
+  <link rel="prefetch" href="main.html" as="document">
   <style>
     body {
       margin: 0;
@@ -158,10 +159,10 @@
     }
     .enter-transition {
       visibility: visible !important;
-      animation: enterPortal 1100ms ease forwards;
+      animation: enterPortal 1200ms ease forwards;
     }
-    .enter-transition::before { animation: enterGlow 1100ms ease forwards; }
-    .enter-transition::after { animation: enterVignette 1100ms ease forwards; }
+    .enter-transition::before { animation: enterGlow 1200ms ease forwards; }
+    .enter-transition::after { animation: enterVignette 1200ms ease forwards; }
 
     @keyframes enterPortal {
       0% { opacity: 0; }
@@ -321,7 +322,7 @@
         overlay.classList.add('enter-transition');
 
         const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const duration = prefersReduced ? 0 : 1100;
+        const duration = prefersReduced ? 0 : 1200;
         setTimeout(() => {
           window.location.href = 'main.html';
         }, duration);

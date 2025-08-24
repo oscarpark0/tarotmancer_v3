@@ -7,6 +7,22 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script src="starfield.js"></script>
+    <style>
+      /* Smooth page fade-in to complement index portal transition */
+      html, body { background: #000; }
+      body { opacity: 0; filter: blur(6px); transform: scale(0.985); }
+      body.page-enter { 
+        opacity: 1; 
+        filter: blur(0);
+        transform: scale(1);
+        transition: opacity 520ms ease, filter 700ms ease, transform 700ms ease;
+        will-change: opacity, filter, transform;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        body { filter: none; transform: none; }
+        body.page-enter { transition: none; }
+      }
+    </style>
     <script
     src="https://app.rybbit.io/api/script.js"
     data-site-id="727"
@@ -57,6 +73,8 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
+        // Begin fade-in on next frame to ensure styles are applied
+        requestAnimationFrame(() => document.body.classList.add('page-enter'));
         // Initialize a calm starfield behind the reading UI
         window.skyMain = initStarfield({ count: 220, zIndex: 0, maxSize: 2.2, minSize: 0.6, layers: 3 });
       });
