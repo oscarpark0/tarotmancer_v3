@@ -320,9 +320,7 @@ button:disabled {
     display: block;
 }
 
-.card.reversed .card-back img {
-    transform: rotate(180deg);
-}
+/* Removed image-level rotate to avoid double 180deg when reversed flips add rotateZ(180deg) */
 
 .interpretation-area,
 .stats-area {
