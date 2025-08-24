@@ -128,13 +128,73 @@
         background-color: rgba(0, 255, 0, 0.15);
         box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
     }
+
+    /* Transition overlay */
+    #transition-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      background:
+        radial-gradient(120vh 120vh at 50% 50%, rgba(0,255,140,0.12), rgba(0,0,0,0) 60%),
+        radial-gradient(200vh 140vh at 50% -20%, rgba(0,255,60,0.08), rgba(0,0,0,0) 55%),
+        #000;
+    }
+    #transition-overlay::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(60vh 60vh at 50% 50%, rgba(0,255,120,0.15), rgba(0,0,0,0) 55%);
+      mix-blend-mode: screen;
+      filter: blur(2px);
+      opacity: 0;
+    }
+    #transition-overlay::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(120vh 80vh at 50% 110%, rgba(0,0,0,0), rgba(0,0,0,0.85) 80%);
+      opacity: 0;
+    }
+    .enter-transition {
+      visibility: visible !important;
+      animation: enterPortal 1100ms ease forwards;
+    }
+    .enter-transition::before { animation: enterGlow 1100ms ease forwards; }
+    .enter-transition::after { animation: enterVignette 1100ms ease forwards; }
+
+    @keyframes enterPortal {
+      0% { opacity: 0; }
+      10% { opacity: 1; }
+      50% { opacity: 1; filter: brightness(1.2) saturate(1.2); }
+      100% { opacity: 1; }
+    }
+    @keyframes enterGlow {
+      0% { opacity: 0; transform: scale(0.8); }
+      50% { opacity: 1; transform: scale(1.1); }
+      100% { opacity: 0; transform: scale(1.3); }
+    }
+    @keyframes enterVignette {
+      0% { opacity: 0; }
+      60% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .enter-transition,
+      .enter-transition::before,
+      .enter-transition::after {
+        animation-duration: 0ms !important;
+      }
+    }
   </style>
 </head>
 <body>
   <div id="tarot-container"></div>
 
+  <div id="transition-overlay" aria-hidden="true"></div>
+
   <div class="enter-container">
-    <button id="enterButton" onclick="window.location.href='main.html'">Enter</button>
+    <button id="enterButton">Enter</button>
   </div>
 
   <script>
@@ -251,6 +311,21 @@
       await loadIndexDeck();
       dealCard();
       scheduleNextDeal();
+
+      // Enter transition handler
+      const btn = document.getElementById('enterButton');
+      const overlay = document.getElementById('transition-overlay');
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        btn.disabled = true;
+        overlay.classList.add('enter-transition');
+
+        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const duration = prefersReduced ? 0 : 1100;
+        setTimeout(() => {
+          window.location.href = 'main.html';
+        }, duration);
+      });
     });
   </script>
 </body>
