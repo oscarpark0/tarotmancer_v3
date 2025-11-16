@@ -239,6 +239,12 @@ button:disabled {
 .label-above { top: -45px; left: 0; z-index: -5; }
 .label-right { left: 130px; top: 50%; transform: translateY(-50%); }
 
+/* Horseshoe-specific label positions */
+.label-horseshoe-left { left: -140px; top: 50%; transform: translateY(-50%); width: 130px; text-align: right; }
+.label-horseshoe-top-left { top: -50px; left: -10px; }
+.label-horseshoe-top-right { top: -50px; left: -10px; }
+.label-horseshoe-right { left: 130px; top: 50%; transform: translateY(-50%); width: 130px; text-align: left; }
+
 .spread-area.celtic-cross-layout .card-container:nth-child(2) .position-label {
     transform: translateY(-50%) rotate(-90deg);
     left: -105px;

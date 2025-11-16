@@ -208,9 +208,18 @@ function displaySpread(spread) {
                 positionLabel.classList.add('label-right');
             }
         } else if (currentSpreadType === 'horseshoe') {
-            if (index === 2 || index === 5 || index === 6) {
-                 positionLabel.classList.add('label-above');
-            } else {
+            // Position labels on outer edge of horseshoe for better visibility
+            if (index === 0) {
+                positionLabel.classList.add('label-horseshoe-left');
+            } else if (index === 1) {
+                positionLabel.classList.add('label-horseshoe-top-left');
+            } else if (index === 2) {
+                positionLabel.classList.add('label-above');
+            } else if (index === 3) {
+                positionLabel.classList.add('label-horseshoe-top-right');
+            } else if (index === 4) {
+                positionLabel.classList.add('label-horseshoe-right');
+            } else if (index === 5 || index === 6) {
                 positionLabel.classList.add('label-below');
             }
         } else {
