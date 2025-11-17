@@ -188,7 +188,7 @@ button:disabled {
 }
 
 .spread-area.horseshoe-layout {
-    width: 900px;
+    width: 800px;
     height: 600px;
 }
 
@@ -212,13 +212,13 @@ button:disabled {
 .spread-area.celtic-cross-layout .card-container:nth-child(10){ top: 50px;  left: 530px; }
 
 /* --- Horseshoe Positions --- */
-.spread-area.horseshoe-layout .card-container:nth-child(1) { top: 250px; left: 130px;  transform: rotate(-25deg); }
-.spread-area.horseshoe-layout .card-container:nth-child(2) { top: 80px;  left: 220px; transform: rotate(-15deg); }
-.spread-area.horseshoe-layout .card-container:nth-child(3) { top: 20px;  left: 390px; }
-.spread-area.horseshoe-layout .card-container:nth-child(4) { top: 80px;  left: 560px; transform: rotate(15deg); }
-.spread-area.horseshoe-layout .card-container:nth-child(5) { top: 250px; left: 650px; transform: rotate(25deg); }
-.spread-area.horseshoe-layout .card-container:nth-child(6) { top: 400px; left: 520px; }
-.spread-area.horseshoe-layout .card-container:nth-child(7) { top: 400px; left: 260px; }
+.spread-area.horseshoe-layout .card-container:nth-child(1) { top: 250px; left: 80px;  transform: rotate(-25deg); }
+.spread-area.horseshoe-layout .card-container:nth-child(2) { top: 80px;  left: 170px; transform: rotate(-15deg); }
+.spread-area.horseshoe-layout .card-container:nth-child(3) { top: 20px;  left: 340px; }
+.spread-area.horseshoe-layout .card-container:nth-child(4) { top: 80px;  left: 510px; transform: rotate(15deg); }
+.spread-area.horseshoe-layout .card-container:nth-child(5) { top: 250px; left: 600px; transform: rotate(25deg); }
+.spread-area.horseshoe-layout .card-container:nth-child(6) { top: 400px; left: 470px; }
+.spread-area.horseshoe-layout .card-container:nth-child(7) { top: 400px; left: 210px; }
 
 .position-label {
     position: absolute;
