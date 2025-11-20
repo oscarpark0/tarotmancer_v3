@@ -6,6 +6,10 @@ const interpretationArea = document.getElementById('interpretationArea');
 const interpretationText = document.getElementById('interpretationText');
 const statsText = document.getElementById('statsText');
 const statsArea = document.getElementById('statsArea');
+const cardModal = document.getElementById('cardModal');
+const modalCardImage = document.getElementById('modalCardImage');
+const modalCardInfo = document.getElementById('modalCardInfo');
+const modalClose = document.getElementById('modalClose');
 
 let deck = [];
 let currentSpread = [];
@@ -61,8 +65,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     displayStats(currentSpreadType);
     setupEventListeners();
     setupResizeObserver();
+    setupCardModal();
 
-    // Keyboard shortcuts: D = Deal, I = Interpret, R = Reroll stars (if present)
+    // Keyboard shortcuts: D = Deal, I = Interpret, R = Reroll stars (if present), Esc = Close modal
     document.addEventListener('keydown', (e) => {
         if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) return;
         const key = e.key.toLowerCase();
@@ -75,6 +80,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else if (key === 'r' && window.skyMain && typeof window.skyMain.reRoll === 'function') {
             e.preventDefault();
             window.skyMain.reRoll();
+        } else if (key === 'escape') {
+            closeCardModal();
         }
     });
 });
@@ -169,6 +176,8 @@ function displaySpread(spread) {
 
         const cardElement = document.createElement('div');
         cardElement.classList.add('card');
+        cardElement.style.cursor = 'pointer';
+        cardElement.dataset.cardIndex = index;
 
         const cardInner = document.createElement('div');
         cardInner.classList.add('card-inner');
@@ -194,6 +203,13 @@ function displaySpread(spread) {
         if (card.isReversed) {
             cardElement.classList.add('reversed');
         }
+
+        // Add click handler for zoom
+        cardElement.addEventListener('click', () => {
+            if (cardElement.classList.contains('is-flipping')) {
+                openCardModal(card);
+            }
+        });
 
         const positionLabel = document.createElement('div');
         positionLabel.classList.add('position-label');
@@ -540,4 +556,44 @@ function displayStats(spreadType) {
     }
 
     statsText.innerHTML = statsHTML;
+}
+
+// Card Modal Functions
+function setupCardModal() {
+    if (!cardModal || !modalClose) return;
+    
+    // Close on background click
+    cardModal.addEventListener('click', closeCardModal);
+    
+    // Close on X button
+    modalClose.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeCardModal();
+    });
+}
+
+function openCardModal(card) {
+    if (!cardModal || !modalCardImage || !modalCardInfo) return;
+    
+    modalCardImage.src = card.image_url;
+    modalCardImage.alt = card.name;
+    
+    if (card.isReversed) {
+        modalCardImage.classList.add('reversed');
+    } else {
+        modalCardImage.classList.remove('reversed');
+    }
+    
+    const reversedText = card.isReversed ? ' (Reversed)' : '';
+    modalCardInfo.textContent = `${card.name}${reversedText}`;
+    
+    cardModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeCardModal() {
+    if (!cardModal) return;
+    
+    cardModal.classList.remove('active');
+    document.body.style.overflow = '';
 }

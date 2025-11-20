@@ -91,6 +91,15 @@
 
     </div>
 
+    <!-- Card Zoom Modal -->
+    <div id="cardModal" class="card-modal">
+        <div class="card-modal-close" id="modalClose">&times;</div>
+        <div class="card-modal-content" onclick="event.stopPropagation()">
+            <img id="modalCardImage" class="card-modal-image" src="" alt="Card">
+            <div id="modalCardInfo" class="card-modal-info"></div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', () => {
