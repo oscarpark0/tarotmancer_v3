@@ -254,6 +254,7 @@ button:disabled {
     left: -50px;
     top: 50%;
     width: 120px;
+    z-index: -1;
 }
 
 @keyframes dealAppear {
