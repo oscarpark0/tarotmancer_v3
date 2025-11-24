@@ -460,6 +460,7 @@ button:disabled {
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
     cursor: pointer;
+    overflow: hidden;
 }
 
 .card-modal.active {
