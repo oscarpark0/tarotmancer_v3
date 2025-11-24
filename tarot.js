@@ -579,6 +579,9 @@ function setupCardModal() {
 function openCardModal(card) {
     if (!cardModal || !modalCardImage || !modalCardInfo) return;
     
+    // Save current scroll position
+    const scrollY = window.scrollY;
+    
     modalCardImage.src = card.image_url;
     modalCardImage.alt = card.name;
     
@@ -591,13 +594,26 @@ function openCardModal(card) {
     const reversedText = card.isReversed ? ' (Reversed)' : '';
     modalCardInfo.textContent = `${card.name}${reversedText}`;
     
+    // Lock body scroll and maintain position
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    
     cardModal.classList.add('active');
-    document.body.style.overflow = 'hidden';
 }
 
 function closeCardModal() {
     if (!cardModal) return;
     
     cardModal.classList.remove('active');
-    document.body.style.overflow = '';
+    
+    // Restore scroll position
+    const scrollY = document.body.style.top;
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+    
+    if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || '0') * -1);
+    }
 }
