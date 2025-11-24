@@ -579,9 +579,6 @@ function setupCardModal() {
 function openCardModal(card) {
     if (!cardModal || !modalCardImage || !modalCardInfo) return;
     
-    // Save current scroll position
-    const scrollY = window.scrollY;
-    
     modalCardImage.src = card.image_url;
     modalCardImage.alt = card.name;
     
@@ -594,16 +591,13 @@ function openCardModal(card) {
     const reversedText = card.isReversed ? ' (Reversed)' : '';
     modalCardInfo.textContent = `${card.name}${reversedText}`;
     
-    // Lock body scroll and maintain position
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-    document.body.style.overflow = 'hidden';
+    // Store and lock scroll position
+    const scrollY = window.scrollY;
+    cardModal.dataset.scrollY = scrollY.toString();
     
-    // Ensure modal is scrolled to top
-    cardModal.scrollTop = 0;
+    // Lock scroll and maintain visual position
+    document.body.style.top = `-${scrollY}px`;
+    document.body.classList.add('modal-open');
     
     cardModal.classList.add('active');
 }
@@ -613,16 +607,13 @@ function closeCardModal() {
     
     cardModal.classList.remove('active');
     
-    // Restore scroll position
-    const scrollY = document.body.style.top;
-    document.documentElement.style.overflow = '';
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.left = '';
-    document.body.style.right = '';
-    document.body.style.overflow = '';
+    // Get stored scroll position
+    const scrollY = parseInt(cardModal.dataset.scrollY || '0');
     
-    if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0') * -1);
-    }
+    // Remove scroll lock
+    document.body.classList.remove('modal-open');
+    document.body.style.top = '';
+    
+    // Restore scroll position
+    window.scrollTo(0, scrollY);
 }
