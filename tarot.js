@@ -591,13 +591,8 @@ function openCardModal(card) {
     const reversedText = card.isReversed ? ' (Reversed)' : '';
     modalCardInfo.textContent = `${card.name}${reversedText}`;
     
-    // Store current scroll position
-    const scrollY = window.scrollY;
-    cardModal.dataset.scrollY = scrollY.toString();
-    
-    // Lock both html and body scroll
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.top = `-${scrollY}px`;
+    // Lock scroll without moving body
+    document.documentElement.classList.add('modal-open');
     document.body.classList.add('modal-open');
     
     // Show modal
@@ -610,14 +605,7 @@ function closeCardModal() {
     // Hide modal
     cardModal.classList.remove('active');
     
-    // Get stored scroll position
-    const scrollY = parseInt(cardModal.dataset.scrollY || '0');
-    
     // Unlock scroll
-    document.documentElement.style.overflow = '';
+    document.documentElement.classList.remove('modal-open');
     document.body.classList.remove('modal-open');
-    document.body.style.top = '';
-    
-    // Restore scroll position
-    window.scrollTo(0, scrollY);
 }
