@@ -591,26 +591,30 @@ function openCardModal(card) {
     const reversedText = card.isReversed ? ' (Reversed)' : '';
     modalCardInfo.textContent = `${card.name}${reversedText}`;
     
-    // Store and lock scroll position
+    // Store current scroll position
     const scrollY = window.scrollY;
     cardModal.dataset.scrollY = scrollY.toString();
     
-    // Lock scroll and maintain visual position
+    // Lock both html and body scroll
+    document.documentElement.style.overflow = 'hidden';
     document.body.style.top = `-${scrollY}px`;
     document.body.classList.add('modal-open');
     
+    // Show modal
     cardModal.classList.add('active');
 }
 
 function closeCardModal() {
     if (!cardModal) return;
     
+    // Hide modal
     cardModal.classList.remove('active');
     
     // Get stored scroll position
     const scrollY = parseInt(cardModal.dataset.scrollY || '0');
     
-    // Remove scroll lock
+    // Unlock scroll
+    document.documentElement.style.overflow = '';
     document.body.classList.remove('modal-open');
     document.body.style.top = '';
     
