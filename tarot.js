@@ -591,21 +591,10 @@ function openCardModal(card) {
     const reversedText = card.isReversed ? ' (Reversed)' : '';
     modalCardInfo.textContent = `${card.name}${reversedText}`;
     
-    // Lock scroll without moving body
-    document.documentElement.classList.add('modal-open');
-    document.body.classList.add('modal-open');
-    
-    // Show modal
     cardModal.classList.add('active');
 }
 
 function closeCardModal() {
     if (!cardModal) return;
-    
-    // Hide modal
     cardModal.classList.remove('active');
-    
-    // Unlock scroll
-    document.documentElement.classList.remove('modal-open');
-    document.body.classList.remove('modal-open');
 }

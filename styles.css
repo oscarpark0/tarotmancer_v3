@@ -454,26 +454,15 @@ button:disabled {
 
 /* Card Zoom Modal */
 .card-modal {
+    display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
     background-color: rgba(0, 0, 0, 0.95);
     z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
     cursor: pointer;
-    overflow: hidden;
-    display: none;
 }
 
 .card-modal.active {
-    opacity: 1;
-    visibility: visible;
     display: flex;
     align-items: center;
     justify-content: center;
