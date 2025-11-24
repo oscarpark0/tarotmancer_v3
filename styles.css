@@ -460,7 +460,6 @@ button:disabled {
     visibility: hidden;
     transition: opacity 0.3s ease, visibility 0.3s ease;
     cursor: pointer;
-    overflow-y: auto;
 }
 
 .card-modal.active {
@@ -471,13 +470,12 @@ button:disabled {
 .card-modal-content {
     position: relative;
     max-width: 600px;
-    margin: auto;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
     cursor: default;
-    padding: 20px 0;
+    padding: 20px;
 }
 
 .card-modal-image {

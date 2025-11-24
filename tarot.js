@@ -562,8 +562,12 @@ function displayStats(spreadType) {
 function setupCardModal() {
     if (!cardModal || !modalClose) return;
     
-    // Close on background click
-    cardModal.addEventListener('click', closeCardModal);
+    // Close on background click only
+    cardModal.addEventListener('click', (e) => {
+        if (e.target === cardModal) {
+            closeCardModal();
+        }
+    });
     
     // Close on X button
     modalClose.addEventListener('click', (e) => {
