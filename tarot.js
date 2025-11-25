@@ -20,7 +20,15 @@ let stats = {};
 const INTERPRET_API_URL = '/interpret'; 
 const CARD_BACK_URL = 'https://ik.imagekit.io/tarotmancer/cardback.webp';
 const DEAL_STAGGER_DELAY = 150; 
-const FLIP_DELAY_AFTER_DEAL_START = 500; 
+const FLIP_DELAY_AFTER_DEAL_START = 500;
+
+// Enhance ImageKit URLs for better quality
+function enhanceImageUrl(url, width = 400) {
+    if (!url || !url.includes('ik.imagekit.io')) return url;
+    // Add ImageKit transformations for better quality
+    const separator = url.includes('?') ? '&' : '?';
+    return `${url}${separator}tr=w-${width},q-90,f-auto`;
+} 
 
 const CELTIC_CROSS_BASE_WIDTH = 700;
 const CELTIC_CROSS_BASE_HEIGHT = 900;
@@ -192,8 +200,9 @@ function displaySpread(spread) {
         const cardBack = document.createElement('div');
         cardBack.classList.add('card-face', 'card-back');
         const backImg = document.createElement('img');
-        backImg.src = card.image_url;
+        backImg.src = enhanceImageUrl(card.image_url, 400);
         backImg.alt = card.name;
+        backImg.loading = 'eager';
         cardBack.appendChild(backImg);
 
         cardInner.appendChild(cardFront);
@@ -579,7 +588,7 @@ function setupCardModal() {
 function openCardModal(card) {
     if (!cardModal || !modalCardImage || !modalCardInfo) return;
     
-    modalCardImage.src = card.image_url;
+    modalCardImage.src = enhanceImageUrl(card.image_url, 1200);
     modalCardImage.alt = card.name;
     
     if (card.isReversed) {
