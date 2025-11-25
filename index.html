@@ -140,6 +140,19 @@
         background-color: rgba(0, 255, 0, 0.15);
         box-shadow: 0 0 15px rgba(0, 255, 0, 0.6);
     }
+    .privacy-link {
+        display: block;
+        margin-top: 20px;
+        color: rgba(0, 255, 0, 0.5);
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 12px;
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+    .privacy-link:hover {
+        color: rgba(0, 255, 0, 0.9);
+        text-decoration: underline;
+    }
 
     /* Transition overlay */
     #transition-overlay {
@@ -207,6 +220,7 @@
 
   <div class="enter-container">
     <button id="enterButton">Enter</button>
+    <a href="privacy-policy.html" class="privacy-link">Privacy Policy</a>
   </div>
 
   <script>
