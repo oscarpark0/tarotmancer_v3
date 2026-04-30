@@ -5,7 +5,10 @@
 //   FIVE9_PROXY_BEARER_TOKEN  - long-lived bearer token issued by Five9
 //   FIVE9_PROXY_URL           - full proxy URL (default: the user's provisioned URL)
 
-const DEFAULT_PROXY_URL = 'https://app.ps.five9.com/proxy/r/38tp/54qn';
+// The POST API endpoint for the Proxyfier (per the Swagger docs) is
+// /proxy/api/v1/go/{orgPath}/{proxyPath}. The /proxy/r/... variant is the
+// GET short-link form and returns 405 for POSTs.
+const DEFAULT_PROXY_URL = 'https://app.ps.five9.com/proxy/api/v1/go/38tp/54qn';
 
 module.exports = async (req, res) => {
     // Same-origin in production; permissive for local/preview testing.
