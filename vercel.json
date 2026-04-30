@@ -2,6 +2,9 @@
   "functions": {
     "api/interpret.js": {
       "maxDuration": 60
+    },
+    "api/proxy.js": {
+      "maxDuration": 30
     }
   }
 }
