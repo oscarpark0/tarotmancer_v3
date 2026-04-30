@@ -46,7 +46,20 @@ module.exports = async (req, res) => {
         ...body,
     };
 
+    // Diagnostic short-circuit: send ?echo=1 to skip the upstream call and
+    // confirm the handler itself is responding correctly.
+    if (req.query && (req.query.echo === '1' || req.query.echo === 'true')) {
+        return res.status(200).json({
+            ok: true,
+            proxyUrl,
+            tokenLen: token.length,
+            receivedPayload: payload,
+            runtime: { node: process.version, region: process.env.VERCEL_REGION || null },
+        });
+    }
+
     try {
+        console.log('[proxy] calling', proxyUrl, 'method=', payload.method, 'url=', payload.url);
         const upstream = await fetch(proxyUrl, {
             method: 'POST',
             headers: {
