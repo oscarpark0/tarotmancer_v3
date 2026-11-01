@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Tarot reading application with AI interpretation",
   "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  },
   "dependencies": {
     "axios": "^1.6.8" 
   }

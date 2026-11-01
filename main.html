@@ -10,43 +10,6 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <script src="starfield.js"></script>
-    <style>
-      html, body { background: #000; }
-      body { opacity: 0; filter: blur(6px); transform: scale(0.985); }
-      body.page-enter { 
-        opacity: 1; 
-        filter: blur(0);
-        transform: scale(1);
-        transition: opacity 520ms ease, filter 700ms ease, transform 700ms ease;
-        will-change: opacity, filter, transform;
-      }
-      #entry-veil {
-        position: fixed; inset: 0; z-index: 999;
-        pointer-events: none; opacity: 1; visibility: visible;
-        background:
-          radial-gradient(120vh 120vh at 50% 50%, rgba(0,255,140,0.12), rgba(0,0,0,0) 60%),
-          radial-gradient(200vh 140vh at 50% -20%, rgba(0,255,60,0.08), rgba(0,0,0,0) 55%),
-          #000;
-      }
-      #entry-veil::before {
-        content: '';
-        position: absolute; inset: 0;
-        background: radial-gradient(60vh 60vh at 50% 50%, rgba(0,255,120,0.15), rgba(0,0,0,0) 55%);
-        mix-blend-mode: screen; filter: blur(2px);
-      }
-      #entry-veil::after {
-        content: '';
-        position: absolute; inset: 0;
-        background: radial-gradient(120vh 80vh at 50% 110%, rgba(0,0,0,0), rgba(0,0,0,0.85) 80%);
-      }
-      #entry-veil.veil-hide { opacity: 0; visibility: hidden; transition: opacity 600ms ease, visibility 0s linear 600ms; }
-      @media (prefers-reduced-motion: reduce) {
-        body { filter: none; transform: none; }
-        body.page-enter { transition: none; }
-        #entry-veil.veil-hide { transition: none; }
-      }
-    </style>
     <script
     src="https://app.rybbit.io/api/script.js"
     data-site-id="727"
@@ -54,7 +17,7 @@
 ></script>
 </head>
 <body>
-    <div id="entry-veil" aria-hidden="true"></div>
+    <canvas id="skyCanvas" class="sky-canvas" aria-hidden="true"></canvas>
     <div class="container">
         <h1>tarotmancer</h1>
 
@@ -73,7 +36,11 @@
         </div>
 
         <div id="spreadAreaWrapper" class="spread-area-wrapper">
-            <div id="spreadArea" class="spread-area"></div>
+            <div id="spreadArea" class="spread-area">
+                <canvas id="spreadCanvas" class="spread-canvas"></canvas>
+            </div>
+            <p id="sceneStatus" role="status">Select a spread, then deal your cards.</p>
+            <details class="card-list"><summary>Cards in this reading</summary><ol id="cardList"></ol></details>
         </div>
 
         <div class="output-area">
@@ -96,23 +63,17 @@
     </div>
 
     <!-- Card Zoom Modal -->
-    <div id="cardModal" class="card-modal">
-        <div class="card-modal-close" id="modalClose">&times;</div>
+    <div id="cardModal" class="card-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modalCardInfo">
+        <button class="card-modal-close" id="modalClose" aria-label="Close card">&times;</button>
         <div class="card-modal-content" onclick="event.stopPropagation()">
-            <img id="modalCardImage" class="card-modal-image" src="" alt="Card">
+            <canvas id="modalCardCanvas" class="card-modal-canvas"></canvas>
+            <p id="modalStatus" role="status"></p>
             <div id="modalCardInfo" class="card-modal-info"></div>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        requestAnimationFrame(() => document.body.classList.add('page-enter'));
-        const veil = document.getElementById('entry-veil');
-        setTimeout(() => veil && veil.classList.add('veil-hide'), 60);
-        window.skyMain = initStarfield({ count: 220, zIndex: 0, maxSize: 2.2, minSize: 0.6, layers: 3 });
-      });
-    </script>
-    <script src="tarot.js"></script>
+    <script type="module" src="tarot.js"></script>
+    <noscript>Enable JavaScript to deal cards and request a reading.</noscript>
 </body>
 </html>

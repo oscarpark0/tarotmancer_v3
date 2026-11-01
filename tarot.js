@@ -1,13 +1,11 @@
+import { createScene } from './phoria-scene.mjs';
+
 const dealButton = document.getElementById('dealButton');
 const interpretButton = document.getElementById('interpretButton');
-const spreadArea = document.getElementById('spreadArea');
-const spreadAreaWrapper = document.getElementById('spreadAreaWrapper');
-const interpretationArea = document.getElementById('interpretationArea');
 const interpretationText = document.getElementById('interpretationText');
 const statsText = document.getElementById('statsText');
-const statsArea = document.getElementById('statsArea');
 const cardModal = document.getElementById('cardModal');
-const modalCardImage = document.getElementById('modalCardImage');
+const modalCardCanvas = document.getElementById('modalCardCanvas');
 const modalCardInfo = document.getElementById('modalCardInfo');
 const modalClose = document.getElementById('modalClose');
 
@@ -17,24 +15,16 @@ let currentSpreadType = 'threeCard';
 let stats = {};
 
 
-const INTERPRET_API_URL = '/interpret'; 
-const CARD_BACK_URL = 'https://ik.imagekit.io/tarotmancer/cardback.webp';
-const DEAL_STAGGER_DELAY = 150; 
-const FLIP_DELAY_AFTER_DEAL_START = 500;
-
-// Enhance ImageKit URLs for better quality
-function enhanceImageUrl(url, width = 400) {
-    if (!url || !url.includes('ik.imagekit.io')) return url;
-    // Add ImageKit transformations for better quality
-    const separator = url.includes('?') ? '&' : '?';
-    return `${url}${separator}tr=w-${width},q-90,f-auto`;
-} 
-
-const CELTIC_CROSS_BASE_WIDTH = 700;
-const CELTIC_CROSS_BASE_HEIGHT = 900;
-const HORSESHOE_BASE_WIDTH = 900;
-const HORSESHOE_BASE_HEIGHT = 600;
-const DEFAULT_SPREAD_AREA_MIN_HEIGHT = '250px';
+let spreadScene;
+let skyScene;
+let modalScene;
+let dealtSpreadType = 'threeCard';
+let dealing = false;
+let interpreting = false;
+let lastFocus;
+const sceneStatus = document.getElementById('sceneStatus');
+const cardList = document.getElementById('cardList');
+const reportSceneError = message => { sceneStatus.textContent = message; };
 
 const spreadDefinitions = {
     threeCard: {
@@ -68,26 +58,36 @@ const spreadDefinitions = {
 };
 
 document.addEventListener('DOMContentLoaded', async () => {
+    spreadScene = createScene(document.getElementById('spreadCanvas'), {
+        interactive: true, description: 'Tarot spread. Use arrow keys to choose a card and Enter to inspect it.',
+        onError: reportSceneError
+    });
+    skyScene = createScene(document.getElementById('skyCanvas'));
+    skyScene?.reRoll();
     await loadDeck();
     loadStats();
     displayStats(currentSpreadType);
     setupEventListeners();
-    setupResizeObserver();
     setupCardModal();
 
     // Keyboard shortcuts: D = Deal, I = Interpret, R = Reroll stars (if present), Esc = Close modal
     document.addEventListener('keydown', (e) => {
         if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) return;
         const key = e.key.toLowerCase();
+        if (cardModal.classList.contains('active')) {
+            if (key === 'escape') closeCardModal();
+            if (key === 'tab') { e.preventDefault(); modalClose.focus(); }
+            return;
+        }
         if (key === 'd' && dealButton && !dealButton.disabled) {
             e.preventDefault();
             handleDealSpread();
         } else if (key === 'i' && interpretButton && !interpretButton.disabled) {
             e.preventDefault();
             handleGetInterpretation();
-        } else if (key === 'r' && window.skyMain && typeof window.skyMain.reRoll === 'function') {
+        } else if (key === 'r' && skyScene) {
             e.preventDefault();
-            window.skyMain.reRoll();
+            skyScene.reRoll();
         } else if (key === 'escape') {
             closeCardModal();
         }
@@ -120,7 +120,7 @@ async function loadDeck() {
         }
     } catch (error) {
         console.error('Error loading deck:', error);
-        spreadArea.textContent = 'Error loading tarot deck. Please check console.';
+        sceneStatus.textContent = 'Unable to load the tarot deck. Please reload to try again.';
         if (dealButton) dealButton.disabled = true;
     }
 }
@@ -177,210 +177,51 @@ function shuffleDeck(array) {
 }
 
 function displaySpread(spread) {
-    const cardElements = [];
-    spread.forEach((card, index) => {
-        const cardContainer = document.createElement('div');
-        cardContainer.classList.add('card-container');
-
-        const cardElement = document.createElement('div');
-        cardElement.classList.add('card');
-        cardElement.style.cursor = 'pointer';
-        cardElement.dataset.cardIndex = index;
-
-        const cardInner = document.createElement('div');
-        cardInner.classList.add('card-inner');
-
-        const cardFront = document.createElement('div');
-        cardFront.classList.add('card-face', 'card-front');
-        const frontImg = document.createElement('img');
-        frontImg.src = CARD_BACK_URL;
-        frontImg.alt = 'Card Back';
-        cardFront.appendChild(frontImg);
-
-        const cardBack = document.createElement('div');
-        cardBack.classList.add('card-face', 'card-back');
-        const backImg = document.createElement('img');
-        backImg.src = enhanceImageUrl(card.image_url, 400);
-        backImg.alt = card.name;
-        backImg.loading = 'eager';
-        cardBack.appendChild(backImg);
-
-        cardInner.appendChild(cardFront);
-        cardInner.appendChild(cardBack);
-        cardElement.appendChild(cardInner);
-
-        if (card.isReversed) {
-            cardElement.classList.add('reversed');
-        }
-
-        // Add click handler for zoom
-        cardElement.addEventListener('click', () => {
-            if (cardElement.classList.contains('is-flipping')) {
-                openCardModal(card);
-            }
-        });
-
-        const positionLabel = document.createElement('div');
-        positionLabel.classList.add('position-label');
-        positionLabel.textContent = card.position;
-
-        if (currentSpreadType === 'celticCross') {
-            if (index <= 2 || index === 3 || index === 5) {
-                positionLabel.classList.add('label-below');
-            } else if (index === 4) {
-                positionLabel.classList.add('label-above');
-            } else if (index >= 6) {
-                positionLabel.classList.add('label-right');
-            }
-        } else if (currentSpreadType === 'horseshoe') {
-            // Position labels on outer edge of horseshoe for better visibility
-            if (index === 0) {
-                positionLabel.classList.add('label-horseshoe-left');
-            } else if (index === 1) {
-                positionLabel.classList.add('label-horseshoe-top-left');
-            } else if (index === 2) {
-                positionLabel.classList.add('label-above');
-            } else if (index === 3) {
-                positionLabel.classList.add('label-horseshoe-top-right');
-            } else if (index === 4) {
-                positionLabel.classList.add('label-horseshoe-right');
-            } else if (index === 5 || index === 6) {
-                positionLabel.classList.add('label-below');
-            }
-        } else {
-            positionLabel.classList.add('label-below');
-        }
-
-        cardContainer.appendChild(cardElement);
-        cardContainer.appendChild(positionLabel);
-
-        spreadArea.appendChild(cardContainer);
-        cardElements.push(cardElement);
-    });
-
-    scaleSpreadArea();
-
-    cardElements.forEach((cardEl, index) => {
-        setTimeout(() => {
-            cardEl.classList.add('is-dealing');
-        }, index * DEAL_STAGGER_DELAY);
-
-        setTimeout(() => {
-            cardEl.classList.add('is-flipping');
-        }, index * DEAL_STAGGER_DELAY + FLIP_DELAY_AFTER_DEAL_START);
+    sceneStatus.textContent = spreadScene
+        ? `${spreadDefinitions[dealtSpreadType].name}. Select a revealed card to inspect it.`
+        : 'The 3D view is unavailable. Open Cards in this reading below to inspect your spread.';
+    try { spreadScene?.showSpread(spread, dealtSpreadType, openCardModal); }
+    catch (error) {
+        console.error('Unable to draw spread:', error);
+        reportSceneError('The 3D spread could not be drawn. Use the card list below to continue your reading.');
+    }
+    cardList.replaceChildren();
+    spread.forEach(card => {
+        const item = document.createElement('li');
+        const button = document.createElement('button');
+        button.textContent = `${card.position}: ${card.name}${card.isReversed ? ' (Reversed)' : ''}`;
+        button.addEventListener('click', () => openCardModal(card));
+        item.append(button);
+        cardList.append(item);
     });
 }
 
-function scaleSpreadArea() {
-    if (!spreadArea || !spreadAreaWrapper || !interpretationArea || !statsArea) return;
-
-    const availableWidth = spreadAreaWrapper.clientWidth - 30; 
-    let scaleFactor = 1;
-    let baseHeight = DEFAULT_SPREAD_AREA_MIN_HEIGHT;
-
-    spreadArea.style.transform = 'scale(1)';
-
-    if (currentSpreadType === 'celticCross') {
-        baseHeight = `${CELTIC_CROSS_BASE_HEIGHT}px`;
-        if (availableWidth < CELTIC_CROSS_BASE_WIDTH) {
-            scaleFactor = availableWidth / CELTIC_CROSS_BASE_WIDTH;
-            spreadArea.style.transform = `scale(${scaleFactor})`;
-        }
-    } else if (currentSpreadType === 'horseshoe') {
-        baseHeight = `${HORSESHOE_BASE_HEIGHT}px`;
-        if (availableWidth < HORSESHOE_BASE_WIDTH) {
-            scaleFactor = availableWidth / HORSESHOE_BASE_WIDTH;
-            spreadArea.style.transform = `scale(${scaleFactor})`;
-        }
-    }
-
-    if (scaleFactor < 1) {
-         const scaledHeight = (currentSpreadType === 'celticCross' ? CELTIC_CROSS_BASE_HEIGHT : HORSESHOE_BASE_HEIGHT) * scaleFactor;
-         spreadArea.style.minHeight = `${scaledHeight}px`;
-    } else {
-         spreadArea.style.minHeight = baseHeight;
-    }
-
-    requestAnimationFrame(() => {
-        const wrapperHeight = spreadAreaWrapper.offsetHeight;
-        if (wrapperHeight > 0) { 
-            interpretationArea.style.height = `${wrapperHeight}px`;
-            statsArea.style.height = `${wrapperHeight}px`; 
-        } else {
-            console.warn('Could not get valid spreadAreaWrapper height.');
-        }
-    });
-}
-
-function setupResizeObserver() {
-    if (!spreadAreaWrapper) return;
-
-    const resizeObserver = new ResizeObserver(entries => {
-        requestAnimationFrame(scaleSpreadArea);
-    });
-
-    resizeObserver.observe(spreadAreaWrapper);
-}
-
-function handleDealSpread() {
-    if (deck.length === 0) {
-        console.error('Deck not loaded.');
-        return;
-    }
-
+async function handleDealSpread() {
+    if (!deck.length || dealing || interpreting) return;
+    dealing = true;
+    dealButton.disabled = true;
     interpretButton.disabled = true;
     interpretationText.textContent = '';
-
-    Array.from(spreadArea.children).forEach(child => {
-        const card = child.querySelector('.card');
-        if (card) {
-            card.classList.remove('is-dealing', 'is-flipping');
-        }
-    });
-
-    setTimeout(() => {
-        spreadArea.innerHTML = '';
-        spreadArea.classList.remove('celtic-cross-layout', 'horseshoe-layout');
-        if (currentSpreadType === 'celticCross') {
-            spreadArea.classList.add('celtic-cross-layout');
-        } else if (currentSpreadType === 'horseshoe') {
-            spreadArea.classList.add('horseshoe-layout');
-        }
-
-        const spreadInfo = spreadDefinitions[currentSpreadType];
-        if (!spreadInfo) {
-            console.error(`Invalid spread type: ${currentSpreadType}`);
-            return;
-        }
-
-        const shuffledDeck = shuffleDeck([...deck]);
-        const drawnCards = shuffledDeck.slice(0, spreadInfo.count);
-
-        currentSpread = drawnCards.map((card, index) => ({
-            ...card,
-            isReversed: Math.random() < 0.5,
-            position: spreadInfo.positions[index] || `Card ${index + 1}`
-        }));
-
-        displaySpread(currentSpread);
-        updateStats(currentSpreadType, currentSpread);
-        saveStats();
-        displayStats(currentSpreadType);
-
-        const maxDealDelay = (spreadInfo.count - 1) * DEAL_STAGGER_DELAY;
-        const lastDealFinishTime = maxDealDelay + 500; 
-        const lastFlipStartTime = maxDealDelay + FLIP_DELAY_AFTER_DEAL_START;
-        const lastFlipFinishTime = lastFlipStartTime + 800; 
-        const totalAnimationTime = Math.max(lastDealFinishTime, lastFlipFinishTime);
-
-        setTimeout(() => {
-             interpretButton.disabled = false;
-        }, totalAnimationTime);
-
-    }, 50); 
+    dealtSpreadType = currentSpreadType;
+    const spreadInfo = spreadDefinitions[dealtSpreadType];
+    currentSpread = shuffleDeck([...deck]).slice(0, spreadInfo.count).map((card, index) => ({
+        ...card, isReversed: Math.random() < 0.5, position: spreadInfo.positions[index]
+    }));
+    displaySpread(currentSpread);
+    updateStats(dealtSpreadType, currentSpread);
+    saveStats();
+    displayStats(currentSpreadType);
+    const duration = !spreadScene || spreadScene.view.reducedMotion ? 0 : ((spreadInfo.count - 1) * 150 + 1300);
+    cardList.querySelectorAll('button').forEach(button => { button.disabled = true; });
+    await new Promise(resolve => setTimeout(resolve, duration));
+    cardList.querySelectorAll('button').forEach(button => { button.disabled = false; });
+    dealing = false;
+    dealButton.disabled = false;
+    interpretButton.disabled = false;
 }
 
 async function handleGetInterpretation() {
+    if (interpreting || dealing) return;
     if (currentSpread.length === 0) {
         interpretationText.textContent = 'Please deal a spread first.';
         return;
@@ -392,13 +233,15 @@ async function handleGetInterpretation() {
     let accumulatedText = '';
     interpretButton.disabled = true;
 
-    const spreadDetails = currentSpread.map((card, index) => {
-        const position = spreadDefinitions[currentSpreadType]?.positions[index] || `Card ${index + 1}`;
+    interpreting = true;
+    dealButton.disabled = true;
+    const spreadDetails = currentSpread.map((card) => {
+        const position = card.position;
         const reversed = card.isReversed ? ' (Reversed)' : '';
         return `${position}: ${card.name}${reversed}`;
     }).join('\n');
 
-    const prompt = `Please provide a thorough and insightful tarot reading interpretation for the following ${spreadDefinitions[currentSpreadType].name} spread:\n\n${spreadDetails}\n\n-Format your response neatly to allow the reader to easily understand the meaning of the spread.\n-Include a summary of the spread, a description of the overall meaning of the spread, and a description of the meaning of each card in the spread. Begin your response with "Dear Seeker".`;
+    const prompt = `Please provide a thorough and insightful tarot reading interpretation for the following ${spreadDefinitions[dealtSpreadType].name} spread:\n\n${spreadDetails}\n\n-Format your response neatly to allow the reader to easily understand the meaning of the spread.\n-Include a summary of the spread, a description of the overall meaning of the spread, and a description of the meaning of each card in the spread. Begin your response with "Dear Seeker".`;
 
     try {
         const response = await fetch('/api/interpret', {
@@ -424,6 +267,8 @@ async function handleGetInterpretation() {
         function push() {
             reader.read().then(({ done, value }) => {
                 if (done) {
+                    interpreting = false;
+                    dealButton.disabled = false;
                     interpretButton.disabled = false;
                     return;
                 }
@@ -433,6 +278,8 @@ async function handleGetInterpretation() {
             }).catch(err => {
                 console.error('Error reading stream:', err);
                 interpretationText.textContent = 'Error displaying interpretation.';
+                interpreting = false;
+                dealButton.disabled = false;
                 interpretButton.disabled = false;
             });
         }
@@ -442,12 +289,15 @@ async function handleGetInterpretation() {
     } catch (error) {
         console.error('Error getting interpretation:', error);
         interpretationText.textContent = `Error: ${error.message}`;
+        interpreting = false;
+        dealButton.disabled = false;
         interpretButton.disabled = false;
     }
 }
 
 function loadStats() {
-    const savedStats = localStorage.getItem('tarotStats');
+    let savedStats;
+    try { savedStats = localStorage.getItem('tarotStats'); } catch { /* Private browsing may disallow storage. */ }
     if (savedStats) {
         try {
             stats = JSON.parse(savedStats) || {};
@@ -586,24 +436,38 @@ function setupCardModal() {
 }
 
 function openCardModal(card) {
-    if (!cardModal || !modalCardImage || !modalCardInfo) return;
-    
-    modalCardImage.src = enhanceImageUrl(card.image_url, 1200);
-    modalCardImage.alt = card.name;
-    
-    if (card.isReversed) {
-        modalCardImage.classList.add('reversed');
-    } else {
-        modalCardImage.classList.remove('reversed');
-    }
-    
-    const reversedText = card.isReversed ? ' (Reversed)' : '';
-    modalCardInfo.textContent = `${card.name}${reversedText}`;
-    
+    lastFocus = document.activeElement;
     cardModal.classList.add('active');
+    cardModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    document.querySelector('.container').inert = true;
+    modalCardInfo.textContent = `${card.name}${card.isReversed ? ' (Reversed)' : ''}`;
+    document.getElementById('modalStatus').textContent = '';
+    modalCardCanvas.hidden = false;
+    modalScene?.dispose();
+    modalScene = createScene(modalCardCanvas, {
+        description: modalCardInfo.textContent,
+        onError: message => { document.getElementById('modalStatus').textContent = message; }
+    });
+    modalScene?.showCard(card);
+    modalClose.focus();
 }
 
 function closeCardModal() {
-    if (!cardModal) return;
+    if (!cardModal.classList.contains('active')) return;
     cardModal.classList.remove('active');
+    cardModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+    document.querySelector('.container').inert = false;
+    modalScene?.dispose();
+    modalScene = null;
+    lastFocus?.focus();
 }
+
+window.addEventListener('pagehide', () => {
+    spreadScene?.dispose();
+    skyScene?.dispose();
+    modalScene?.dispose();
+});
+// A restored bfcache page needs fresh WebGL resources and listeners.
+window.addEventListener('pageshow', event => { if (event.persisted) location.reload(); });
