@@ -9,7 +9,6 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <script
     src="https://app.rybbit.io/api/script.js"
     data-site-id="727"
@@ -18,57 +17,65 @@
 </head>
 <body>
     <canvas id="skyCanvas" class="sky-canvas" aria-hidden="true"></canvas>
-    <div class="container">
-        <h1>tarotmancer</h1>
+    <main class="container">
+        <header class="site-header">
+            <h1><a class="wordmark" href="index.html">tarotmancer</a></h1>
+        </header>
 
         <div id="controls" class="controls-area">
             <div class="spread-selector">
-                <span>Select Spread:</span>
+                <span class="control-label">Select spread:</span>
                 <div class="spread-buttons">
-                    <button class="spread-button active" data-spread="threeCard">3 Card</button>
-                    <button class="spread-button" data-spread="celticCross">Celtic Cross</button>
-                    <button class="spread-button" data-spread="horseshoe">Horseshoe</button>
+                    <button class="spread-button active" data-spread="threeCard" aria-pressed="true">Three cards <span>03</span></button>
+                    <button class="spread-button" data-spread="celticCross" aria-pressed="false">Celtic Cross <span>10</span></button>
+                    <button class="spread-button" data-spread="horseshoe" aria-pressed="false">Horseshoe <span>07</span></button>
                 </div>
             </div>
             <div class="action-buttons">
-                <button id="dealButton" disabled>Deal</button>
+                <button id="dealButton" class="primary-button" disabled>Shuffle &amp; deal</button>
             </div>
         </div>
 
-        <div id="spreadAreaWrapper" class="spread-area-wrapper">
+        <div class="reading-layout">
+        <section id="spreadAreaWrapper" class="spread-area-wrapper" aria-labelledby="spreadTitle">
+            <div class="table-heading"><h2 id="spreadTitle">3 Card Spread</h2><span id="spreadCount">78-card deck</span></div>
             <div id="spreadArea" class="spread-area">
                 <canvas id="spreadCanvas" class="spread-canvas"></canvas>
             </div>
-            <p id="sceneStatus" role="status">Select a spread, then deal your cards.</p>
+            <p id="sceneStatus" role="status">Select a spread, then shuffle and deal.</p>
             <details class="card-list"><summary>Cards in this reading</summary><ol id="cardList"></ol></details>
-        </div>
+        </section>
 
-        <div class="output-area">
+        <aside class="output-area" aria-label="Your reading">
             <div id="stats-controls" class="tab-header">
                 <button class="tab-button active" data-tab="interpretation">Interpretation</button>
                 <button class="tab-button" data-tab="stats">Statistics</button>
             </div>
             <div class="tab-content">
                 <div id="interpretationArea" class="interpretation-area">
-                    <button id="interpretButton" disabled>Get Interpretation</button>
-                    <div id="interpretationText"> </div>
+                    <div id="interpretationText">Deal a spread to get an interpretation.</div>
+                    <button id="interpretButton" disabled>Get interpretation</button>
                 </div>
                 <div id="statsArea" class="stats-area hidden">
-                    <h2>Stats</h2>
                     <div id="statsText"></div>
                 </div>
             </div>
+        </aside>
         </div>
+        <footer class="site-footer"><a href="privacy-policy.html">Privacy Policy</a></footer>
 
-    </div>
+    </main>
 
     <!-- Card Zoom Modal -->
     <div id="cardModal" class="card-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="modalCardInfo">
         <button class="card-modal-close" id="modalClose" aria-label="Close card">&times;</button>
         <div class="card-modal-content" onclick="event.stopPropagation()">
+            <p class="eyebrow" id="modalPosition"></p>
             <canvas id="modalCardCanvas" class="card-modal-canvas"></canvas>
             <p id="modalStatus" role="status"></p>
-            <div id="modalCardInfo" class="card-modal-info"></div>
+            <h2 id="modalCardInfo" class="card-modal-info"></h2>
+            <p id="modalDescription" class="card-modal-description"></p>
+            <p class="showcase-hint">Move your pointer to tilt the card · Esc to return</p>
         </div>
     </div>
 

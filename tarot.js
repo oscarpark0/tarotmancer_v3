@@ -1,4 +1,5 @@
 import { createScene } from './phoria-scene.mjs';
+import { Showcase } from './showcase.mjs';
 
 const dealButton = document.getElementById('dealButton');
 const interpretButton = document.getElementById('interpretButton');
@@ -17,7 +18,10 @@ let stats = {};
 
 let spreadScene;
 let skyScene;
-let modalScene;
+const showcase = new Showcase(() => createScene(modalCardCanvas, {
+    perspective: true,
+    onError: message => { document.getElementById('modalStatus').textContent = message; }
+}));
 let dealtSpreadType = 'threeCard';
 let dealing = false;
 let interpreting = false;
@@ -59,11 +63,12 @@ const spreadDefinitions = {
 
 document.addEventListener('DOMContentLoaded', async () => {
     spreadScene = createScene(document.getElementById('spreadCanvas'), {
-        interactive: true, description: 'Tarot spread. Use arrow keys to choose a card and Enter to inspect it.',
+        interactive: true, perspective: true, description: 'Tarot spread. Use arrow keys to choose a card and Enter to inspect it.',
         onError: reportSceneError
     });
     skyScene = createScene(document.getElementById('skyCanvas'));
     skyScene?.reRoll();
+    spreadScene?.showIdle();
     await loadDeck();
     loadStats();
     displayStats(currentSpreadType);
@@ -129,8 +134,9 @@ function setupEventListeners() {
     const spreadButtons = document.querySelectorAll('.spread-button');
     spreadButtons.forEach(btn => {
         btn.addEventListener('click', () => {
-            spreadButtons.forEach(b => b.classList.remove('active'));
+            spreadButtons.forEach(b => { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
             btn.classList.add('active');
+            btn.setAttribute('aria-pressed', 'true');
             currentSpreadType = btn.dataset.spread;
             displayStats(currentSpreadType);
         });
@@ -178,9 +184,15 @@ function shuffleDeck(array) {
 
 function displaySpread(spread) {
     sceneStatus.textContent = spreadScene
-        ? `${spreadDefinitions[dealtSpreadType].name}. Select a revealed card to inspect it.`
+        ? 'Preparing the deck…'
         : 'The 3D view is unavailable. Open Cards in this reading below to inspect your spread.';
-    try { spreadScene?.showSpread(spread, dealtSpreadType, openCardModal); }
+    let animation = Promise.resolve();
+    document.getElementById('spreadTitle').textContent = spreadDefinitions[dealtSpreadType].name;
+    document.getElementById('spreadCount').textContent = `${spread.length} cards`;
+    try {
+        animation = spreadScene?.showSpread(spread, dealtSpreadType, openCardModal,
+            message => { sceneStatus.textContent = message; }) || animation;
+    }
     catch (error) {
         console.error('Unable to draw spread:', error);
         reportSceneError('The 3D spread could not be drawn. Use the card list below to continue your reading.');
@@ -194,6 +206,7 @@ function displaySpread(spread) {
         item.append(button);
         cardList.append(item);
     });
+    return animation;
 }
 
 async function handleDealSpread() {
@@ -201,20 +214,23 @@ async function handleDealSpread() {
     dealing = true;
     dealButton.disabled = true;
     interpretButton.disabled = true;
-    interpretationText.textContent = '';
+    interpretationText.textContent = 'Select Get interpretation to read this spread.';
+    dealButton.textContent = 'Shuffling…';
+    document.querySelectorAll('.spread-button').forEach(button => { button.disabled = true; });
     dealtSpreadType = currentSpreadType;
     const spreadInfo = spreadDefinitions[dealtSpreadType];
     currentSpread = shuffleDeck([...deck]).slice(0, spreadInfo.count).map((card, index) => ({
         ...card, isReversed: Math.random() < 0.5, position: spreadInfo.positions[index]
     }));
-    displaySpread(currentSpread);
+    const animation = displaySpread(currentSpread);
     updateStats(dealtSpreadType, currentSpread);
     saveStats();
     displayStats(currentSpreadType);
-    const duration = !spreadScene || spreadScene.view.reducedMotion ? 0 : ((spreadInfo.count - 1) * 150 + 1300);
     cardList.querySelectorAll('button').forEach(button => { button.disabled = true; });
-    await new Promise(resolve => setTimeout(resolve, duration));
+    await animation;
     cardList.querySelectorAll('button').forEach(button => { button.disabled = false; });
+    document.querySelectorAll('.spread-button').forEach(button => { button.disabled = false; });
+    dealButton.textContent = 'Shuffle & deal again';
     dealing = false;
     dealButton.disabled = false;
     interpretButton.disabled = false;
@@ -317,7 +333,7 @@ function loadStats() {
                 stats[spreadType].reversals = stats[spreadType].reversals || 0;
             }
         });
-        console.log('Stats loaded and validated from localStorage.');
+
     } else {
         stats = {};
         Object.keys(spreadDefinitions).forEach(spreadType => {
@@ -329,7 +345,7 @@ function loadStats() {
                 reversals: 0
             };
         });
-        console.log('No saved stats found, initialized new stats object.');
+
     }
 }
 
@@ -444,12 +460,9 @@ function openCardModal(card) {
     modalCardInfo.textContent = `${card.name}${card.isReversed ? ' (Reversed)' : ''}`;
     document.getElementById('modalStatus').textContent = '';
     modalCardCanvas.hidden = false;
-    modalScene?.dispose();
-    modalScene = createScene(modalCardCanvas, {
-        description: modalCardInfo.textContent,
-        onError: message => { document.getElementById('modalStatus').textContent = message; }
-    });
-    modalScene?.showCard(card);
+    document.getElementById('modalPosition').textContent = card.position || 'From the deck';
+    document.getElementById('modalDescription').textContent = card.description || '';
+    showcase.show(card);
     modalClose.focus();
 }
 
@@ -459,15 +472,14 @@ function closeCardModal() {
     cardModal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('modal-open');
     document.querySelector('.container').inert = false;
-    modalScene?.dispose();
-    modalScene = null;
+    showcase.hide();
     lastFocus?.focus();
 }
 
 window.addEventListener('pagehide', () => {
     spreadScene?.dispose();
     skyScene?.dispose();
-    modalScene?.dispose();
+    showcase.dispose();
 });
 // A restored bfcache page needs fresh WebGL resources and listeners.
 window.addEventListener('pageshow', event => { if (event.persisted) location.reload(); });

@@ -11,22 +11,11 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="prefetch" href="main.html" as="document">
   <script type="module" src="landing.mjs"></script>
-  <style>
-    body { padding: 0; overflow: hidden; min-height: 100svh; display: grid; place-items: center; }
-    #landingCanvas { position: fixed; inset: 0; width: 100%; height: 100%; }
-    .enter-container { z-index: 2; position: relative; text-align: center; }
-    #enterButton { display: inline-block; background: #001400dd; border: 2px solid #00ff00;
-      padding: 15px 30px; font-size: 20px; border-radius: 6px; color: #00ff00;
-      text-decoration: none; text-transform: uppercase; letter-spacing: 2px; box-shadow: 0 0 10px #00ff0066; }
-    #enterButton:hover { background: #003315; }
-    .privacy-link { display: block; margin-top: 20px; color: #7abe8b; font-size: 12px; }
-    #landingStatus { max-width: 300px; font-size: 12px; background: #000b; }
-  </style>
 </head>
-<body>
+<body class="landing-page">
   <canvas id="landingCanvas" aria-hidden="true"></canvas>
   <div class="enter-container">
-    <a id="enterButton" href="main.html">Enter</a>
+    <a id="enterButton" class="primary-button" href="main.html">Enter</a>
     <a href="privacy-policy.html" class="privacy-link">Privacy Policy</a>
     <p id="landingStatus" role="status"></p>
   </div>

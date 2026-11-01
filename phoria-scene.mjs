@@ -1,42 +1,52 @@
-import { View, Group, Mesh, Points, Geometry, Label, Texture, OrthographicCamera } from './vendor/phoria2/phoria2.js';
-import { CARD_WIDTH, CARD_HEIGHT, layouts, cardPose } from './scene-layouts.mjs';
+import { View, Group, Mesh, Points, Geometry, Label, Texture, OrthographicCamera, PerspectiveCamera } from './vendor/phoria2/phoria2.js';
+import { layouts, cardPose, dealPose, shufflePose, SHUFFLE_SECONDS } from './scene-layouts.mjs';
+import { cardFaceGeometry, cardBodyGeometry } from './card-geometry.mjs';
 
 const BACK = 'https://ik.imagekit.io/tarotmancer/cardback.webp';
 const rand = (min, max) => min + Math.random() * (max - min);
 
-// UVs use the image's top-left origin (Texture.flipY defaults to false).
-function faceGeometry() {
-    const w = CARD_WIDTH / 2, h = CARD_HEIGHT / 2;
-    return new Geometry({ positions: [-w, -h, 0, w, -h, 0, w, h, 0, -w, h, 0],
-        normals: [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1],
-        uvs: [0, 1, 1, 1, 1, 0, 0, 0], indices: [0, 1, 2, 0, 2, 3] });
-}
-
 export class TarotScene {
-    constructor(canvas, { interactive = false, description = 'Tarotmancer stars', onError = () => {} } = {}) {
+    constructor(canvas, { interactive = false, description = 'Tarotmancer stars', perspective = false, onError = () => {} } = {}) {
         this.canvas = canvas;
+        this.active = true;
+        this.perspective = perspective;
+        this.generation = 0;
         this.onError = onError;
         this.textures = new Map();
         this.cards = [];
         this.disposed = false;
-        this.view = new View({ canvas, camera: new OrthographicCamera({ height: 12,
-            position: [0, 0, 30], target: [0, 0, 0], near: 0.1, far: 100 }),
+        this.view = new View({ canvas, camera: perspective
+            ? new PerspectiveCamera({ fov: 36, position: [0, 0, 30], target: [0, 0, 0], near: 0.1, far: 100 })
+            : new OrthographicCamera({ height: 12, position: [0, 0, 30], target: [0, 0, 0], near: 0.1, far: 100 }),
             autoLight: false, toneMapping: 'none', keyboard: interactive,
             description, pixelRatio: Math.min(window.devicePixelRatio || 1, 2) });
         this.cardGroup = this.view.scene.add(new Group());
         this.starGroup = this.view.scene.add(new Group({ pickable: false }));
         this.elapsed = 0;
         this.view.start((dt) => {
-            if (!document.hidden && !this.contextLost) this.update(Math.min(dt, 0.05));
+            if (this.active && !document.hidden && !this.contextLost) this.update(Math.min(dt, 0.1));
         });
         this.resizeObserver = new ResizeObserver(() => this.resize());
         this.resizeObserver.observe(canvas);
         this.onLost = event => {
             event.preventDefault();
             this.contextLost = true;
+            this.finishDeal?.();
+            this.finishDeal = null;
             this.onError('The graphics context was lost. Reload the page to restore the scene.');
         };
+        this.onRestored = () => { this.contextLost = false; this.view.invalidate(); };
         canvas.addEventListener('webglcontextlost', this.onLost);
+        canvas.addEventListener('webglcontextrestored', this.onRestored);
+        this.pointer = { x: 0, y: 0 };
+        this.onPointer = event => {
+            const rect = canvas.getBoundingClientRect();
+            this.pointer.x = ((event.clientX - rect.left) / rect.width - 0.5) * 0.22;
+            this.pointer.y = ((event.clientY - rect.top) / rect.height - 0.5) * 0.16;
+        };
+        this.onLeave = () => { this.pointer.x = 0; this.pointer.y = 0; };
+        canvas.addEventListener('pointermove', this.onPointer);
+        canvas.addEventListener('pointerleave', this.onLeave);
     }
 
     texture(url) {
@@ -55,19 +65,21 @@ export class TarotScene {
         return this.textures.get(url);
     }
 
-    makeCard(card, onSelect, width = 500) {
+    makeCard(card, onSelect, width = 500, backOnly = false) {
         const root = this.cardGroup.add(new Group({ name: card.name,
-            highlight: onSelect ? '#193d25' : null, highlightWhole: true,
+            highlight: onSelect ? '#153c22' : null, highlightWhole: true,
             tooltip: () => `${card.position ? card.position + ': ' : ''}${card.name}${card.isReversed ? ' (Reversed)' : ''}`,
             onClick: () => { if (entry.ready) onSelect?.(card); } }));
+        root.pickable = !backOnly;
         const flip = root.add(new Group());
-        const front = flip.add(new Mesh({ name: card.name, geometry: faceGeometry(),
-            material: { color: '#123b22', map: this.texture(`${card.image_url}${card.image_url.includes('?') ? '&' : '?'}tr=w-${width},q-90,f-auto`), unlit: true },
-            rotation: [0, 0, card.isReversed ? Math.PI : 0], position: [0, 0, 0.005] }));
-        const back = flip.add(new Mesh({ geometry: faceGeometry(), material: { color: '#123b22', map: this.texture(BACK), unlit: true },
-            rotation: [0, Math.PI, 0], position: [0, 0, -0.005] }));
+        flip.add(new Mesh({ geometry: cardBodyGeometry(), material: { color: '#3d7159', unlit: true } }));
+        const front = flip.add(new Mesh({ name: card.name, geometry: cardFaceGeometry(),
+            material: { color: '#123b22', map: this.texture(backOnly ? BACK : `${card.image_url}${card.image_url.includes('?') ? '&' : '?'}tr=w-${width},q-90,f-auto`), unlit: true },
+            rotation: [0, 0, card.isReversed ? Math.PI : 0], position: [0, 0, 0.016] }));
+        const back = flip.add(new Mesh({ geometry: cardFaceGeometry(), material: { color: '#123b22', map: this.texture(BACK), unlit: true },
+            rotation: [0, Math.PI, 0], position: [0, 0, -0.016] }));
         const placeholder = root.add(new Label({ text: card.name, className: 'scene-label',
-            position: [0, 0, 0.02], place: 'center', pickable: false, visible: this.mode !== 'landing' }));
+            position: [0, 0, 0.02], place: 'center', pickable: false, visible: !backOnly && this.mode === 'zoom' }));
         front.material.map.ready.then(() => {
             if (!this.disposed && root.parent) {
                 front.material.color.set('white');
@@ -77,12 +89,17 @@ export class TarotScene {
         back.material.map.ready.then(() => {
             if (!this.disposed && root.parent) back.material.color.set('white');
         }).catch(() => {});
-        const entry = { card, root, flip, front, ready: false, base: [0, 0, 0, 0] };
+        const entry = { card, root, flip, front, placeholder, ready: false, base: [0, 0, 0, 0] };
         this.cards.push(entry);
         return entry;
     }
 
     clearCards() {
+        this.generation++;
+        this.finishDeal?.();
+        this.finishDeal = null;
+        this.animating = false;
+        this.shuffleExtras = [];
         for (const child of [...this.cardGroup.children]) {
             child.removeFromParent();
             child.dispose();
@@ -93,31 +110,76 @@ export class TarotScene {
         this.textures.clear();
     }
 
-    showSpread(cards, type, onSelect) {
+    addDeck(count = 14) {
+        const entries = [];
+        for (let index = 0; index < count; index++) {
+            const entry = this.makeCard({ name: 'Tarot deck', image_url: BACK }, null, 500, true);
+            this.cards.pop();
+            entry.flip.rotation.y = Math.PI;
+            entries.push(entry);
+        }
+        return entries;
+    }
+
+    showIdle() {
+        this.clearCards();
+        this.mode = 'idle';
+        this.layout = layouts.threeCard;
+        this.shuffleExtras = this.addDeck();
+        this.shuffleExtras.forEach((entry, index) => {
+            entry.root.position.set(index * 0.008, index * 0.005, index * 0.035);
+            entry.root.rotation.set(-0.16, 0.2, -0.12);
+        });
+        this.resize();
+    }
+
+    showSpread(cards, type, onSelect, onPhase = () => {}) {
         this.clearCards();
         this.mode = 'spread';
         this.layout = layouts[type];
         this.canvas.style.aspectRatio = `${this.layout.width} / ${this.layout.height}`;
-        this.canvas.parentElement.style.maxWidth = `${this.layout.width * 100}px`;
+        this.canvas.parentElement.style.maxWidth = `${this.layout.width * 105}px`;
         this.elapsed = 0;
+        this.onPhase = onPhase;
         cards.forEach((card, index) => {
             const entry = this.makeCard(card, onSelect);
             entry.base = this.layout.positions[index];
-            const [x, y, z = 0, rotation = 0] = entry.base;
-            // Crossing-card labels sit beside the cross; other labels remain horizontal below cards.
-            this.cardGroup.add(new Label({ text: card.position, className: 'scene-label', pickable: false,
+            const [x, y, z = 0] = entry.base;
+            entry.label = this.cardGroup.add(new Label({ text: card.position, className: 'scene-label', pickable: false, visible: false,
                 position: type === 'celticCross' && index === 1 ? [x, y - 0.86, 0.2] : [x, y - 1.2, z], place: 'below' }));
-            entry.root.rotation.z = rotation;
+            entry.flip.rotation.y = Math.PI;
+            entry.root.position.z = (cards.length - index) * 0.038;
         });
+        this.shuffleExtras = this.view.reducedMotion ? [] : this.addDeck(16 - cards.length);
+        this.shuffleExtras.forEach((entry, index) => { entry.root.position.z = -index * 0.038; });
         this.resize();
-        this.update(0);
+        const generation = this.generation;
+        const finished = new Promise(resolve => { this.finishDeal = resolve; });
+        onPhase('Preparing the deck…');
+        // Start once the backs are ready; a failed/slow image must never block a reading.
+        let timeout;
+        const timeoutPromise = new Promise(resolve => { timeout = setTimeout(resolve, 5000); });
+        Promise.race([this.texture(BACK).ready.catch(() => {}), timeoutPromise]).then(() => {
+            clearTimeout(timeout);
+            if (this.disposed || generation !== this.generation) return;
+            this.elapsed = 0;
+            this.animating = true;
+            this.phase = 'shuffle';
+            onPhase(this.view.reducedMotion ? 'Your spread is ready.' : 'Shuffling the deck…');
+            this.update(0);
+        });
+        return finished;
     }
 
     showCard(card) {
         this.clearCards();
         this.mode = 'zoom';
-        this.layout = { width: 1.5, height: 2.3 };
-        this.makeCard(card, null, 1200).ready = true;
+        this.active = true;
+        this.layout = { width: 1.65, height: 2.55 };
+        this.pointer = { x: 0, y: 0 };
+        const entry = this.makeCard(card, null, 1200);
+        entry.ready = true;
+        this.elapsed = 0;
         this.resize();
         this.view.invalidate();
     }
@@ -160,7 +222,7 @@ export class TarotScene {
             const positions = [];
             for (let i = 0; i < 90; i++) positions.push(rand(-22, 22), rand(-14, 14), -5 - layer);
             this.starGroup.add(new Points({ geometry: new Geometry({ positions }), pickable: false,
-                material: { color: layer === 0 ? '#bce8cf' : '#ffffff', size: 1 + layer * 0.6,
+                material: { color: layer === 0 ? '#a3edbc' : '#e6f2e9', size: 1 + layer * 0.6,
                     sizeAttenuation: false, unlit: true, opacity: 0.55 + layer * 0.15 } }));
         }
     }
@@ -171,8 +233,14 @@ export class TarotScene {
         if (!rect.width || !rect.height) return;
         const aspect = rect.width / rect.height;
         const layout = this.layout || { width: 0, height: 12 };
-        this.view.camera.height = Math.max(layout.height, layout.width / aspect);
-        this.worldWidth = this.view.camera.height * aspect;
+        const height = Math.max(layout.height, layout.width / aspect);
+        if (this.perspective) this.view.camera.position.z = height / (2 * Math.tan(Math.PI / 10));
+        else this.view.camera.height = height;
+        this.worldWidth = height * aspect;
+        this.cards.forEach((entry, index) => {
+            if (entry.label) entry.label.text = rect.width < 480 && this.cards.length > 3
+                ? String(index + 1) : entry.card.position;
+        });
         if (this.mode === 'landing') this.cards.forEach(entry => { entry.ready = false; });
         this.view.invalidate();
     }
@@ -201,17 +269,41 @@ export class TarotScene {
                 entry.flip.rotation.y = pose.flipY;
                 entry.ready = pose.ready;
             });
-        } else if (this.mode === 'spread') {
+        } else if (this.mode === 'spread' && this.animating) {
+            const total = this.cards.length + this.shuffleExtras.length;
             this.cards.forEach((entry, index) => {
-                if (entry.ready) return;
-                const pose = cardPose(this.elapsed, index, entry.card.isReversed, reduced);
-                const [x, y, z = 0] = entry.base;
-                entry.root.visible = pose.visible;
-                entry.root.position.set(x, y + pose.offsetY, z);
-                entry.root.scale.set(pose.scale, pose.scale, pose.scale);
+                const pose = dealPose(this.elapsed, index, total, entry.base, reduced);
+                entry.root.position.set(pose.x, pose.y, pose.z);
+                entry.root.rotation.set(pose.rx, pose.ry, pose.rz);
                 entry.flip.rotation.y = pose.flipY;
                 entry.ready = pose.ready;
+                entry.label.visible = pose.ready;
+                entry.placeholder.visible = pose.ready && !entry.front.material.map.image;
             });
+            this.shuffleExtras.forEach((entry, index) => {
+                const pose = shufflePose(Math.min(this.elapsed, SHUFFLE_SECONDS), index + this.cards.length, total);
+                entry.root.position.set(pose.x, pose.y, pose.z);
+                entry.root.rotation.set(pose.rx, pose.ry, pose.rz);
+                entry.root.visible = !reduced && this.elapsed < SHUFFLE_SECONDS;
+            });
+            if (this.elapsed >= SHUFFLE_SECONDS && this.phase === 'shuffle') {
+                this.phase = 'deal';
+                this.onPhase('Dealing your cards…');
+            }
+            if (this.cards.every(entry => entry.ready)) {
+                this.animating = false;
+                this.onPhase('Your spread is ready. Select a card to explore it.');
+                this.finishDeal?.();
+                this.finishDeal = null;
+            }
+        } else if (this.mode === 'zoom' && this.cards.length) {
+            const root = this.cards[0].root;
+            const targetX = reduced ? 0 : -this.pointer.y;
+            const targetY = reduced ? 0 : this.pointer.x;
+            if (Math.abs(root.rotation.x - targetX) > 0.0001 || Math.abs(root.rotation.y - targetY) > 0.0001) {
+                root.rotation.x += (targetX - root.rotation.x) * Math.min(1, dt * 10);
+                root.rotation.y += (targetY - root.rotation.y) * Math.min(1, dt * 10);
+            }
         }
     }
 
@@ -220,6 +312,9 @@ export class TarotScene {
         this.disposed = true;
         this.resizeObserver.disconnect();
         this.canvas.removeEventListener('webglcontextlost', this.onLost);
+        this.canvas.removeEventListener('webglcontextrestored', this.onRestored);
+        this.canvas.removeEventListener('pointermove', this.onPointer);
+        this.canvas.removeEventListener('pointerleave', this.onLeave);
         this.clearCards();
         this.view.dispose();
     }
