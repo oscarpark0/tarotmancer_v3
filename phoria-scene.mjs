@@ -165,7 +165,7 @@ export class TarotScene {
             this.elapsed = 0;
             this.animating = true;
             this.phase = 'shuffle';
-            onPhase(this.view.reducedMotion ? 'Your spread is ready.' : 'Shuffling the deck…');
+            onPhase(this.view.reducedMotion ? '' : 'Shuffling the deck…');
             this.update(0);
         });
         return finished;
@@ -292,7 +292,7 @@ export class TarotScene {
             }
             if (this.cards.every(entry => entry.ready)) {
                 this.animating = false;
-                this.onPhase('Your spread is ready. Select a card to explore it.');
+                this.onPhase('');
                 this.finishDeal?.();
                 this.finishDeal = null;
             }
