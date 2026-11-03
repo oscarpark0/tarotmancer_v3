@@ -42,19 +42,19 @@
             <div id="spreadArea" class="spread-area">
                 <canvas id="spreadCanvas" class="spread-canvas"></canvas>
             </div>
-            <p id="sceneStatus" role="status">Select a spread, then shuffle and deal.</p>
+            <p id="sceneStatus" role="status"> </p>
             <details class="card-list"><summary>Cards in this reading</summary><ol id="cardList"></ol></details>
         </section>
 
-        <aside class="output-area" aria-label="Your reading">
+        <aside class="output-area" aria-label="reading">
             <div id="stats-controls" class="tab-header">
                 <button class="tab-button active" data-tab="interpretation">Interpretation</button>
                 <button class="tab-button" data-tab="stats">Statistics</button>
             </div>
             <div class="tab-content">
                 <div id="interpretationArea" class="interpretation-area">
-                    <div id="interpretationText">Deal a spread to get an interpretation.</div>
-                    <button id="interpretButton" disabled>Get interpretation</button>
+                    <div id="interpretationText">Begin.</div>
+                    <button id="interpretButton" disabled>Interpret</button>
                 </div>
                 <div id="statsArea" class="stats-area hidden">
                     <div id="statsText"></div>
@@ -75,7 +75,6 @@
             <p id="modalStatus" role="status"></p>
             <h2 id="modalCardInfo" class="card-modal-info"></h2>
             <p id="modalDescription" class="card-modal-description"></p>
-            <p class="showcase-hint">Move your pointer to tilt the card · Esc to return</p>
         </div>
     </div>
 

@@ -13,7 +13,7 @@ async function loadCards() {
         const deck = Object.values(await response.json());
         if (scene && !scene.disposed) scene.showLanding(deck);
     } catch {
-        status.textContent = 'The deck preview is unavailable. You can still enter Tarotmancer.';
+        status.textContent = 'The deck preview is unavailable.';
     }
 }
 loadCards();

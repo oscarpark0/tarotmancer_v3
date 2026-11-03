@@ -12,7 +12,7 @@ const modalClose = document.getElementById('modalClose');
 
 let deck = [];
 let currentSpread = [];
-let currentSpreadType = 'threeCard'; 
+let currentSpreadType = 'threeCard';
 let stats = {};
 
 
@@ -75,7 +75,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupEventListeners();
     setupCardModal();
 
-    // Keyboard shortcuts: D = Deal, I = Interpret, R = Reroll stars (if present), Esc = Close modal
     document.addEventListener('keydown', (e) => {
         if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable)) return;
         const key = e.key.toLowerCase();
@@ -245,7 +244,7 @@ async function handleGetInterpretation() {
 
     document.querySelector('.tab-button[data-tab="interpretation"]').click();
 
-    interpretationText.innerHTML = ''; 
+    interpretationText.innerHTML = '';
     let accumulatedText = '';
     interpretButton.disabled = true;
 
@@ -381,7 +380,7 @@ function saveStats() {
 }
 
 function displayStats(spreadType) {
-    if (!statsText || !deck.length) return; 
+    if (!statsText || !deck.length) return;
 
     const spreadStats = stats[spreadType];
     const spreadName = spreadDefinitions[spreadType]?.name || 'Spread';
@@ -403,7 +402,7 @@ function displayStats(spreadType) {
             .join('');
         return `<ul>${sortedItems}</ul>`;
     };
-    
+
     const createSimpleList = (data) => {
          const sortedItems = Object.entries(data)
             .sort(([, a], [, b]) => b - a)
@@ -436,14 +435,14 @@ function displayStats(spreadType) {
 // Card Modal Functions
 function setupCardModal() {
     if (!cardModal || !modalClose) return;
-    
+
     // Close on background click only
     cardModal.addEventListener('click', (e) => {
         if (e.target === cardModal) {
             closeCardModal();
         }
     });
-    
+
     // Close on X button
     modalClose.addEventListener('click', (e) => {
         e.stopPropagation();
