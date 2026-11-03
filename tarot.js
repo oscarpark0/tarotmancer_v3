@@ -213,7 +213,6 @@ async function handleDealSpread() {
     dealing = true;
     dealButton.disabled = true;
     interpretButton.disabled = true;
-    interpretationText.textContent = 'Select Get interpretation to read this spread.';
     dealButton.textContent = 'Shuffling…';
     document.querySelectorAll('.spread-button').forEach(button => { button.disabled = true; });
     dealtSpreadType = currentSpreadType;
